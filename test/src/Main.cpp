@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <SimpleJson/StaticSequence.hpp>
-
 namespace SimpleJson_Test
 {
 	size_t g_numOfTestFile = 0;

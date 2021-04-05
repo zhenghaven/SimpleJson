@@ -12,7 +12,7 @@ namespace SimpleJson
 namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 #endif
 {
-	namespace StaticSequenceInternal
+	namespace ConstSequenceInternal
 	{
 		template<size_t Len, typename T, T headArg, T... args>
 		struct StripTailImpl;
@@ -30,7 +30,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		using Prepend = DataSequence<DataType, pre, data...>;
 
 		template<size_t Len>
-		using StripTail = typename StaticSequenceInternal::StripTailImpl<Len, DataType, data...>::type;
+		using StripTail = typename ConstSequenceInternal::StripTailImpl<Len, DataType, data...>::type;
 
 		static constexpr size_t sk_size = sizeof...(data);
 		static constexpr DataType const sk_cdata[sk_size]{ data... };
@@ -60,7 +60,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		using StrPrepend = StrSequence<pre, chars...>;
 
 		template<size_t Len>
-		using StripStrTail = typename StaticSequenceInternal::StripStrTailImpl<Len, chars...>::type;
+		using StripStrTail = typename ConstSequenceInternal::StripStrTailImpl<Len, chars...>::type;
 
 		static const char* GetCStr()
 		{
@@ -78,7 +78,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		}
 	};
 
-	namespace StaticSequenceInternal
+	namespace ConstSequenceInternal
 	{
 		template<typename T, T headArg, T... args>
 		struct StripTailImpl<1, T, headArg, args...>
@@ -139,7 +139,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 	//template<typename StrStruct>
 	//using ExpandStr = typename ExpandStrImpl<StrStruct, sizeof(StrStruct::sk_str) - 1>::Expanded;
 
-	namespace StaticSequenceInternal
+	namespace ConstSequenceInternal
 	{
 		template<size_t i, typename T, size_t n>
 		constexpr T ExpandArrayImpl(const T(&a)[n])
@@ -151,9 +151,9 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 }
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
-#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SimpleJson::StaticSequenceInternal::ExpandArrayImpl<(I)>(S),SimpleJson::StaticSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
+#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SimpleJson::ConstSequenceInternal::ExpandArrayImpl<(I)>(S),SimpleJson::ConstSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
 #else
-#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SIMPLEJSON_CUSTOMIZED_NAMESPACE::StaticSequenceInternal::ExpandArrayImpl<(I)>(S),SIMPLEJSON_CUSTOMIZED_NAMESPACE::StaticSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
+#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SIMPLEJSON_CUSTOMIZED_NAMESPACE::ConstSequenceInternal::ExpandArrayImpl<(I)>(S),SIMPLEJSON_CUSTOMIZED_NAMESPACE::ConstSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
 #endif
 
 #define SIMPLEJSON_EXPANDARRAY_4(  S, I) SIMPLEJSON_EXPANDARRAY_2(  S, (I)),SIMPLEJSON_EXPANDARRAY_2(  S, (I) + 2)
@@ -170,11 +170,11 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 #define SIMPLEJSON_CARRAY_LEN(S)      (sizeof(S) / SIMPLEJSON_CARRAY_DATASIZE(S))
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
-#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SimpleJson::StaticSequenceInternal::ExpandArrayImpl<(I)>(S),SimpleJson::StaticSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
-#define SIMPLEJSON_STATIC_ARRAY(S)  SimpleJson::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
-#define SIMPLEJSON_STATIC_STRING(S) SimpleJson::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
+#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SimpleJson::ConstSequenceInternal::ExpandArrayImpl<(I)>(S),SimpleJson::ConstSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
+#define SIMPLEJSON_CONST_ARRAY(S)  SimpleJson::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
+#define SIMPLEJSON_CONST_STRING(S) SimpleJson::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
 #else
-#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SIMPLEJSON_CUSTOMIZED_NAMESPACE::StaticSequenceInternal::ExpandArrayImpl<(I)>(S),SIMPLEJSON_CUSTOMIZED_NAMESPACE::StaticSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
-#define SIMPLEJSON_STATIC_ARRAY(S)  SIMPLEJSON_CUSTOMIZED_NAMESPACE::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
-#define SIMPLEJSON_STATIC_STRING(S) SIMPLEJSON_CUSTOMIZED_NAMESPACE::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
+#define SIMPLEJSON_EXPANDARRAY_2(  S, I) SIMPLEJSON_CUSTOMIZED_NAMESPACE::ConstSequenceInternal::ExpandArrayImpl<(I)>(S),SIMPLEJSON_CUSTOMIZED_NAMESPACE::ConstSequenceInternal::ExpandArrayImpl<(I) + 1>(S)
+#define SIMPLEJSON_CONST_ARRAY(S)  SIMPLEJSON_CUSTOMIZED_NAMESPACE::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
+#define SIMPLEJSON_CONST_STRING(S) SIMPLEJSON_CUSTOMIZED_NAMESPACE::GetSequence<SIMPLEJSON_CARRAY_LEN(S), SIMPLEJSON_CARRAY_DATATYPE(S), SIMPLEJSON_EXPANDARRAY(S)>::type
 #endif
