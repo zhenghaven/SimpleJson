@@ -99,7 +99,10 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 				return res;
 			}
+		}
 
+		namespace Internal
+		{
 			template<typename ValType, size_t _Bytes,
 				EnableIfT<_Bytes <= sizeof(ValType), int> = 0>
 			constexpr ValType TrailingOnes()
@@ -167,7 +170,27 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			static_assert(TrailingZeros< int32_t, 4>() == 0x00000000U, "Programming Error");
 			static_assert(TrailingZeros<uint64_t, 4>() == 0xFFFFFFFF00000000ULL, "Programming Error");
 			static_assert(TrailingZeros< int64_t, 4>() == ~static_cast<int64_t>(0x00FFFFFFFF), "Programming Error");
+		}
 
+		inline bool IsValidUtfCodePt(char32_t val)
+		{
+			return Internal::IsValidCodePt(val);
+		}
+
+		template<typename ValType>
+		inline constexpr bool IsAscii(ValType val)
+		{
+			return (~((~val) | 0x7F)) == 0;
+		}
+		static_assert(IsAscii('\0'), "Programming Error");
+		static_assert(IsAscii('\n'), "Programming Error");
+		static_assert(IsAscii('a'), "Programming Error");
+		static_assert(IsAscii('\x7f'), "Programming Error");
+		static_assert(!IsAscii('\x80'), "Programming Error");
+		static_assert(!IsAscii(~static_cast<int8_t>(0)), "Programming Error");
+
+		namespace Internal
+		{
 			inline size_t CalcUtf8NumContNeeded(char32_t val)
 			{
 				if (!IsValidCodePt(val))
@@ -334,7 +357,8 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return std::make_pair(res, begin);
 		}
 
-		inline std::string CodePtToUtf8Once(char32_t val)
+		template<typename OutputIt>
+		inline void CodePtToUtf8Once(char32_t val, OutputIt oit)
 		{
 			size_t numCont = Internal::CalcUtf8NumContNeeded(val);
 			char res[4]{0, 0, 0, 0};
@@ -367,7 +391,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				break;
 			}
 
-			return std::string(std::begin(res), std::begin(res) + numCont + 1);
+			std::copy(std::begin(res), std::begin(res) + 1 + numCont, oit);
 		}
 
 		template<typename InputIt,
@@ -478,7 +502,8 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			);
 		}
 
-		inline std::u16string CodePtToUtf16Once(char32_t val)
+		template<typename OutputIt>
+		inline void CodePtToUtf16Once(char32_t val, OutputIt oit)
 		{
 			if (!Internal::IsValidCodePt(val))
 			{
@@ -486,229 +511,223 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					+ std::to_string(val) + " is not a valid UTF code point.");
 			}
 
+			char16_t resUtf[2] = { 0 };
+
 			if ((0x0000 <= val && val <= 0xD7FF) ||
 				(0xE000 <= val && val <= 0xFFFF))
 			// Single 16 bits encoding
 			{
-				return { static_cast<char16_t>(val) };
+				resUtf[0] = static_cast<char16_t>(val);
+				std::copy(std::begin(resUtf), std::begin(resUtf) + 1, oit);
 			}
 			else
 			// Surrogate Pairs
 			{
 				char32_t code = (val - 0x10000);
 
-				char16_t first  = 0xD800 | (code >> 10);
-				char16_t second = 0xDC00 | (code & 0x3FF);
+				resUtf[0] = 0xD800 | (code >> 10);
+				resUtf[1] = 0xDC00 | (code & 0x3FF);
 
-				return {first, second};
+				std::copy(std::begin(resUtf), std::end(resUtf), oit);
 			}
 		}
 
-		inline std::u32string CodePtToUtf32Once(char32_t val)
+		template<typename OutputIt>
+		inline void CodePtToUtf32Once(char32_t val, OutputIt oit)
 		{
 			if (!Internal::IsValidCodePt(val))
 			{
 				throw UtfConversionException("Invalid UTF Code Point" " - "
 					+ std::to_string(val) + " is not a valid UTF code point.");
 			}
-			return { static_cast<char32_t>(val) };
+
+			char32_t resUtf[1] = { static_cast<char32_t>(val) };
+
+			std::copy(std::begin(resUtf), std::end(resUtf), oit);
 		}
 
-		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt>
-		inline
-		std::pair<
-			Internal::InvokeResultT<
-				OutBoundFunc,
-				typename Internal::InvokeResultT<InBoundFunc, InputIt, InputIt>::first_type
-			>,
-			InputIt
-		>
-		UtfConvertOnce(InBoundFunc inFunc, OutBoundFunc outFunc,
-			InputIt begin, InputIt end)
+		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt, typename OutputIt>
+		inline InputIt UtfConvertOnce(InBoundFunc inFunc, OutBoundFunc outFunc,
+			InputIt begin, InputIt end,
+			OutputIt dest)
 		{
 			auto codePtRes = inFunc(begin, end);
-			auto outRes = outFunc(codePtRes.first);
-			return std::make_pair(
-				outRes,
-				codePtRes.second
-			);
+			outFunc(codePtRes.first, dest);
+			return codePtRes.second;
 		}
 
-		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt>
-		inline
-		Internal::InvokeResultT<
-			OutBoundFunc,
-			typename Internal::InvokeResultT<InBoundFunc, InputIt, InputIt>::first_type
-		>
-		UtfConvert(InBoundFunc inFunc, OutBoundFunc outFunc,
-			InputIt begin, InputIt end)
+		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt, typename OutputIt>
+		inline void UtfConvert(InBoundFunc inFunc, OutBoundFunc outFunc,
+			InputIt begin, InputIt end,
+			OutputIt dest)
 		{
-			using ResStrType = Internal::InvokeResultT<
-				OutBoundFunc,
-				typename Internal::InvokeResultT<InBoundFunc, InputIt, InputIt>::first_type
-			>;
-
-			ResStrType strRes;
-
 			while (begin != end)
 			{
-				auto oneRes = UtfConvertOnce(inFunc, outFunc, begin, end);
-				strRes += oneRes.first;
-				begin = oneRes.second;
+				begin = UtfConvertOnce(inFunc, outFunc, begin, end, dest);
 			}
-
-			return strRes;
 		}
 
 
 		// ==========  UTF-8 --> UTF-16
 
+		template<typename InputIt, typename OutputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
+		inline void Utf8ToUtf16(InputIt begin, InputIt end, OutputIt dest)
+		{
+			return UtfConvert(Utf8ToCodePtOnce<InputIt>, CodePtToUtf16Once<OutputIt>,
+				begin, end, dest);
+		}
+
 		inline std::u16string Utf8ToUtf16(const std::string& utf8)
 		{
-			return UtfConvert(Utf8ToCodePtOnce<std::string::const_iterator>, CodePtToUtf16Once,
-				utf8.begin(), utf8.end());
+			std::u16string resUtfStr;
+
+			Utf8ToUtf16(utf8.begin(), utf8.end(), std::back_inserter(resUtfStr));
+
+			return resUtfStr;
 		}
 
-		template<typename InputIt,
+		template<typename InputIt, typename OutputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
-		inline std::u16string Utf8ToUtf16(InputIt begin, InputIt end)
+		inline InputIt Utf8ToUtf16Once(InputIt begin, InputIt end, OutputIt dest)
 		{
-			return UtfConvert(Utf8ToCodePtOnce<InputIt>, CodePtToUtf16Once,
-				begin, end);
-		}
-
-		template<typename InputIt,
-			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
-		inline std::pair<std::u16string, InputIt>
-		Utf8ToUtf16Once(InputIt begin, InputIt end)
-		{
-			return UtfConvertOnce(Utf8ToCodePtOnce<InputIt>, CodePtToUtf16Once,
-				begin, end);
+			return UtfConvertOnce(Utf8ToCodePtOnce<InputIt>, CodePtToUtf16Once<OutputIt>,
+				begin, end, dest);
 		}
 
 		// ==========  UTF-8 --> UTF-32
 
+		template<typename InputIt, typename OutputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
+		inline void Utf8ToUtf32(InputIt begin, InputIt end, OutputIt dest)
+		{
+			return UtfConvert(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32Once<OutputIt>,
+				begin, end, dest);
+		}
+
 		inline std::u32string Utf8ToUtf32(const std::string& utf8)
 		{
-			return UtfConvert(Utf8ToCodePtOnce<std::string::const_iterator>, CodePtToUtf32Once,
-				utf8.begin(), utf8.end());
+			std::u32string resUtfStr;
+
+			Utf8ToUtf32(utf8.begin(), utf8.end(), std::back_inserter(resUtfStr));
+
+			return resUtfStr;
 		}
 
-		template<typename InputIt,
+		template<typename InputIt, typename OutputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
-		inline std::u32string Utf8ToUtf32(InputIt begin, InputIt end)
+		inline InputIt Utf8ToUtf32Once(InputIt begin, InputIt end, OutputIt dest)
 		{
-			return UtfConvert(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32Once,
-				begin, end);
-		}
-
-		template<typename InputIt,
-			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
-		inline std::pair<std::u32string, InputIt>
-		Utf8ToUtf32Once(InputIt begin, InputIt end)
-		{
-			return UtfConvertOnce(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32Once,
-				begin, end);
+			return UtfConvertOnce(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32Once<OutputIt>,
+				begin, end, dest);
 		}
 
 		// ==========  UTF-16 --> UTF-8
 
+		template<typename InputIt, typename OutputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
+		inline void Utf16ToUtf8(InputIt begin, InputIt end, OutputIt dest)
+		{
+			return UtfConvert(Utf16ToCodePtOnce<InputIt>, CodePtToUtf8Once<OutputIt>,
+				begin, end, dest);
+		}
+
 		inline std::string Utf16ToUtf8(const std::u16string& in)
 		{
-			return UtfConvert(Utf16ToCodePtOnce<std::u16string::const_iterator>, CodePtToUtf8Once,
-				in.begin(), in.end());
+			std::string resUtfStr;
+
+			Utf16ToUtf8(in.begin(), in.end(), std::back_inserter(resUtfStr));
+
+			return resUtfStr;
 		}
 
-		template<typename InputIt,
+		template<typename InputIt, typename OutputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
-		inline std::string Utf16ToUtf8(InputIt begin, InputIt end)
+		inline InputIt Utf16ToUtf8Once(InputIt begin, InputIt end, OutputIt dest)
 		{
-			return UtfConvert(Utf16ToCodePtOnce<InputIt>, CodePtToUtf8Once,
-				begin, end);
-		}
-
-		template<typename InputIt,
-			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
-		inline std::pair<std::string, InputIt>
-		Utf16ToUtf8Once(InputIt begin, InputIt end)
-		{
-			return UtfConvertOnce(Utf16ToCodePtOnce<InputIt>, CodePtToUtf8Once,
-				begin, end);
+			return UtfConvertOnce(Utf16ToCodePtOnce<InputIt>, CodePtToUtf8Once<OutputIt>,
+				begin, end, dest);
 		}
 
 		// ==========  UTF-16 --> UTF-32
 
+		template<typename InputIt, typename OutputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
+		inline void Utf16ToUtf32(InputIt begin, InputIt end, OutputIt dest)
+		{
+			return UtfConvert(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32Once<OutputIt>,
+				begin, end, dest);
+		}
+
 		inline std::u32string Utf16ToUtf32(const std::u16string& in)
 		{
-			return UtfConvert(Utf16ToCodePtOnce<std::u16string::const_iterator>, CodePtToUtf32Once,
-				in.begin(), in.end());
+			std::u32string resUtfStr;
+
+			Utf16ToUtf32(in.begin(), in.end(), std::back_inserter(resUtfStr));
+
+			return resUtfStr;
 		}
 
-		template<typename InputIt,
+		template<typename InputIt, typename OutputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
-		inline std::u32string Utf16ToUtf32(InputIt begin, InputIt end)
+		inline InputIt Utf16ToUtf32Once(InputIt begin, InputIt end, OutputIt dest)
 		{
-			return UtfConvert(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32Once,
-				begin, end);
-		}
-
-		template<typename InputIt,
-			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
-		inline std::pair<std::u32string, InputIt>
-		Utf16ToUtf32Once(InputIt begin, InputIt end)
-		{
-			return UtfConvertOnce(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32Once,
-				begin, end);
+			return UtfConvertOnce(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32Once<OutputIt>,
+				begin, end, dest);
 		}
 
 		// ==========  UTF-32 --> UTF-8
 
+		template<typename InputIt, typename OutputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
+		inline void Utf32ToUtf8(InputIt begin, InputIt end, OutputIt dest)
+		{
+			return UtfConvert(Utf32ToCodePtOnce<InputIt>, CodePtToUtf8Once<OutputIt>,
+				begin, end, dest);
+		}
+
 		inline std::string Utf32ToUtf8(const std::u32string& in)
 		{
-			return UtfConvert(Utf32ToCodePtOnce<std::u32string::const_iterator>, CodePtToUtf8Once,
-				in.begin(), in.end());
+			std::string resUtfStr;
+
+			Utf32ToUtf8(in.begin(), in.end(), std::back_inserter(resUtfStr));
+
+			return resUtfStr;
 		}
 
-		template<typename InputIt,
+		template<typename InputIt, typename OutputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
-		inline std::string Utf32ToUtf8(InputIt begin, InputIt end)
+		inline InputIt Utf32ToUtf8Once(InputIt begin, InputIt end, OutputIt dest)
 		{
-			return UtfConvert(Utf32ToCodePtOnce<InputIt>, CodePtToUtf8Once,
-				begin, end);
-		}
-
-		template<typename InputIt,
-			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
-		inline std::pair<std::string, InputIt>
-		Utf32ToUtf8Once(InputIt begin, InputIt end)
-		{
-			return UtfConvertOnce(Utf32ToCodePtOnce<InputIt>, CodePtToUtf8Once,
-				begin, end);
+			return UtfConvertOnce(Utf32ToCodePtOnce<InputIt>, CodePtToUtf8Once<OutputIt>,
+				begin, end, dest);
 		}
 
 		// ==========  UTF-32 --> UTF-16
 
+		template<typename InputIt, typename OutputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
+		inline void Utf32ToUtf16(InputIt begin, InputIt end, OutputIt dest)
+		{
+			return UtfConvert(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16Once<OutputIt>,
+				begin, end, dest);
+		}
+
 		inline std::u16string Utf32ToUtf16(const std::u32string& in)
 		{
-			return UtfConvert(Utf32ToCodePtOnce<std::u32string::const_iterator>, CodePtToUtf16Once,
-				in.begin(), in.end());
+			std::u16string resUtfStr;
+
+			Utf32ToUtf16(in.begin(), in.end(), std::back_inserter(resUtfStr));
+
+			return resUtfStr;
 		}
 
-		template<typename InputIt,
+		template<typename InputIt, typename OutputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
-		inline std::u16string Utf32ToUtf16(InputIt begin, InputIt end)
+		inline InputIt Utf32ToUtf16Once(InputIt begin, InputIt end, OutputIt dest)
 		{
-			return UtfConvert(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16Once,
-				begin, end);
-		}
-
-		template<typename InputIt,
-			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
-		inline std::pair<std::u16string, InputIt>
-		Utf32ToUtf16Once(InputIt begin, InputIt end)
-		{
-			return UtfConvertOnce(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16Once,
-				begin, end);
+			return UtfConvertOnce(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16Once<OutputIt>,
+				begin, end, dest);
 		}
 	}
 }
