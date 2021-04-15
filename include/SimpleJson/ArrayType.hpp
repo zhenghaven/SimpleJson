@@ -121,6 +121,17 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return res;
 		}
 
+	private: // static member:
+
+		template<typename OutputIt>
+		static void RepeatOutput(OutputIt dest, const std::string& src, size_t count)
+		{
+			for (size_t i = 0; i < count; ++i)
+			{
+				std::copy(src.begin(), src.end(), dest);
+			}
+		}
+
 	public:
 
 		Vector() :
@@ -349,53 +360,82 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return m_data.assign(first, last);
 		}
 
-		std::string ToString(const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+		template<typename OutputIt>
+		void ToString(OutputIt dest, const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
 		{
+			constexpr char lbrStr[] = "[";
+			constexpr char rbrStr[] = "]";
+			constexpr char cmaStr[] = ",";
+
 			if (indent.size() > 0)
 			{
 				if (m_data.size() > 0)
 				{
-					std::string appIndent;
-					for (size_t i = 0; i < nestLevel; ++i)
-					{
-						appIndent += indent;
-					}
+					// std::string appIndent;
+					// for (size_t i = 0; i < nestLevel; ++i)
+					// {
+					// 	appIndent += indent;
+					// }
 
-					std::string res = '[' + lineEnd;
+					//std::string res = '[' + lineEnd;
+					std::copy(std::begin(lbrStr), std::end(lbrStr) - 1, dest);
+					std::copy(lineEnd.begin(), lineEnd.end(), dest);
 
 					for (size_t i = 0; i < m_data.size() - 1; ++i)
 					{
-						res += appIndent + indent + m_data[i].ToString(indent, lineEnd, sortKeys, nestLevel + 1, true);
+						//res += appIndent + indent + m_data[i].ToString(indent, lineEnd, sortKeys, nestLevel + 1, true);
+						RepeatOutput(dest, indent, nestLevel + 1);
+						m_data[i].ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, true);
 					}
 
-					res += appIndent + indent + m_data.back().ToString(indent, lineEnd, sortKeys, nestLevel + 1, false);
+					//res += appIndent + indent + m_data.back().ToString(indent, lineEnd, sortKeys, nestLevel + 1, false);
+					RepeatOutput(dest, indent, nestLevel + 1);
+					m_data.back().ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, false);
 
-					res += appIndent + ']' + (addComma ? "," : "") + lineEnd;
-
-					return res;
+					//res += appIndent + ']' + (addComma ? "," : "") + lineEnd;
+					RepeatOutput(dest, indent, nestLevel);
+					std::copy(std::begin(rbrStr), std::end(rbrStr) - 1, dest);
+					if (addComma)
+					{
+						std::copy(std::begin(cmaStr), std::end(cmaStr) - 1, dest);
+					}
+					std::copy(lineEnd.begin(), lineEnd.end(), dest);
 				}
 				else
 				{
-					return std::string("[]") + (addComma ? "," : "") + lineEnd;
+					//return std::string("[]") + (addComma ? "," : "") + lineEnd;
+					std::copy(std::begin(lbrStr), std::end(lbrStr) - 1, dest);
+					std::copy(std::begin(rbrStr), std::end(rbrStr) - 1, dest);
+					if (addComma)
+					{
+						std::copy(std::begin(cmaStr), std::end(cmaStr) - 1, dest);
+					}
+					std::copy(lineEnd.begin(), lineEnd.end(), dest);
 				}
 			}
 			else
 			{
-				std::string res = "[";
+				//std::string res = "[";
+				std::copy(std::begin(lbrStr), std::end(lbrStr) - 1, dest);
 
 				for (size_t i = 0; m_data.size() > 0 && i < m_data.size() - 1; ++i)
 				{
-					res += m_data[i].ToString(indent, lineEnd, sortKeys, nestLevel + 1, true);
+					//res += m_data[i].ToString(indent, lineEnd, sortKeys, nestLevel + 1, true);
+					m_data[i].ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, true);
 				}
 
 				if (m_data.size() > 0)
 				{
-					res += m_data.back().ToString(indent, lineEnd, sortKeys, nestLevel + 1, false);
+					//res += m_data.back().ToString(indent, lineEnd, sortKeys, nestLevel + 1, false);
+					m_data.back().ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, false);
 				}
 
-				res = res + ']' + (addComma ? "," : "");
-
-				return res;
+				//res = res + ']' + (addComma ? "," : "");
+				std::copy(std::begin(rbrStr), std::end(rbrStr) - 1, dest);
+				if (addComma)
+				{
+					std::copy(std::begin(cmaStr), std::end(cmaStr) - 1, dest);
+				}
 			}
 		}
 
@@ -468,7 +508,9 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		virtual std::string ToString(const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const override
 		{
-			return _TypeBase::ToString(indent, lineEnd, sortKeys, nestLevel, addComma);
+			std::string res;
+			_TypeBase::ToString(std::back_inserter(res), indent, lineEnd, sortKeys, nestLevel, addComma);
+			return res;
 		}
 
 	protected:

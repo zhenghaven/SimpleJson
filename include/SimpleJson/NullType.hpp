@@ -51,17 +51,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return res;
 		}
 
-		std::string ToString(const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+		template<typename OutputIt>
+		void ToString(OutputIt dest, const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
 		{
-			std::string valStr = "null";
+			constexpr char nlStr[] = "null";
+			constexpr char cmaStr[] = ",";
+
+			std::copy(std::begin(nlStr), std::end(nlStr) - 1, dest);
+
+			if (addComma)
+			{
+				std::copy(std::begin(cmaStr), std::end(cmaStr) - 1, dest);
+			}
 
 			if (indent.size() > 0)
 			{
-				return valStr + (addComma ? "," : "") + lineEnd;
-			}
-			else
-			{
-				return valStr + (addComma ? "," : "");
+				std::copy(lineEnd.begin(), lineEnd.end(), dest);
 			}
 		}
 
@@ -113,7 +118,9 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		virtual std::string ToString(const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const override
 		{
-			return _TypeBase::ToString(indent, lineEnd, sortKeys, nestLevel, addComma);
+			std::string res;
+			_TypeBase::ToString(std::back_inserter(res), indent, lineEnd, sortKeys, nestLevel, addComma);
+			return res;
 		}
 
 	protected:

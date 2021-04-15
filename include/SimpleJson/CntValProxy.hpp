@@ -127,6 +127,13 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return m_data->ToString(indent, lineEnd, sortKeys, nestLevel, addComma);
 		}
 
+		template<typename OutputIt>
+		void ToString(OutputIt dest, const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+		{
+			std::string tmp = m_data->ToString(indent, lineEnd, sortKeys, nestLevel, addComma);
+			std::copy(tmp.begin(), tmp.end(), dest);
+		}
+
 	private:
 		std::unique_ptr<Json> m_data;
 	};

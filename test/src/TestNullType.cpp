@@ -133,7 +133,7 @@ GTEST_TEST(TestNull, ToString)
 
 		std::string testOut;
 
-		testOut = Null::Parse(testInput.begin(), testInput.end()).ToString();
+		Null::Parse(testInput.begin(), testInput.end()).ToString(std::back_inserter(testOut));
 		EXPECT_EQ(testOut, "null");
 	}
 
@@ -142,7 +142,7 @@ GTEST_TEST(TestNull, ToString)
 
 		std::string testOut;
 
-		testOut = Null::Parse(testInput.begin(), testInput.end()).ToString("\t");
+		Null::Parse(testInput.begin(), testInput.end()).ToString(std::back_inserter(testOut), "\t");
 		EXPECT_EQ(testOut, "null\n");
 	}
 }

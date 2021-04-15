@@ -184,7 +184,7 @@ GTEST_TEST(TestBool, ToString)
 
 		std::string testOut;
 
-		testOut = Bool::Parse(testInput.begin(), testInput.end()).ToString();
+		Bool::Parse(testInput.begin(), testInput.end()).ToString(std::back_inserter(testOut));
 		EXPECT_EQ(testOut, "true");
 	}
 
@@ -193,7 +193,7 @@ GTEST_TEST(TestBool, ToString)
 
 		std::string testOut;
 
-		testOut = Bool::Parse(testInput.begin(), testInput.end()).ToString("\t");
+		Bool::Parse(testInput.begin(), testInput.end()).ToString(std::back_inserter(testOut), "\t");
 		EXPECT_EQ(testOut, "false\n");
 	}
 }

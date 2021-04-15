@@ -377,7 +377,7 @@ GTEST_TEST(TestArray, ToString)
 
 		std::string testOut;
 
-		testOut = Vector<Vector<Vector<Bool> > >::Parse(testInput.begin(), testInput.end()).ToString();
+		Vector<Vector<Vector<Bool> > >::Parse(testInput.begin(), testInput.end()).ToString(std::back_inserter(testOut));
 		EXPECT_EQ(testOut, "[[[true,false],[false]],[[],[false,true]],[[]]]");
 	}
 
@@ -386,7 +386,7 @@ GTEST_TEST(TestArray, ToString)
 
 		std::string testOut;
 
-		testOut = Vector<Vector<Vector<Bool> > >::Parse(testInput.begin(), testInput.end()).ToString("\t");
+		Vector<Vector<Vector<Bool> > >::Parse(testInput.begin(), testInput.end()).ToString(std::back_inserter(testOut), "\t");
 		EXPECT_EQ(testOut, "[\n\t[\n\t\t[\n\t\t\ttrue,\n\t\t\tfalse\n\t\t],\n\t\t[\n\t\t\tfalse\n\t\t]\n\t],\n\t[\n\t\t[],\n\t\t[\n\t\t\tfalse,\n\t\t\ttrue\n\t\t]\n\t],\n\t[\n\t\t[]\n\t]\n]\n");
 	}
 }
