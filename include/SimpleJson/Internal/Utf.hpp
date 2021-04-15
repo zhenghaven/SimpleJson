@@ -394,6 +394,11 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			std::copy(std::begin(res), std::begin(res) + 1 + numCont, oit);
 		}
 
+		inline size_t CodePtToUtf8OnceGetSize(char32_t val)
+		{
+			return 1 + Internal::CalcUtf8NumContNeeded(val);
+		}
+
 		template<typename InputIt,
 			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
 		inline std::pair<char32_t, InputIt> Utf16ToCodePtOnce(InputIt begin, InputIt end)
@@ -532,6 +537,27 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 		}
 
+		inline size_t CodePtToUtf16OnceGetSize(char32_t val)
+		{
+			if (!Internal::IsValidCodePt(val))
+			{
+				throw UtfConversionException("Invalid UTF Code Point" " - "
+					+ std::to_string(val) + " is not a valid UTF code point.");
+			}
+
+			if ((0x0000 <= val && val <= 0xD7FF) ||
+				(0xE000 <= val && val <= 0xFFFF))
+			// Single 16 bits encoding
+			{
+				return 1;
+			}
+			else
+			// Surrogate Pairs
+			{
+				return 2;
+			}
+		}
+
 		template<typename OutputIt>
 		inline void CodePtToUtf32Once(char32_t val, OutputIt oit)
 		{
@@ -544,6 +570,17 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			char32_t resUtf[1] = { static_cast<char32_t>(val) };
 
 			std::copy(std::begin(resUtf), std::end(resUtf), oit);
+		}
+
+		inline size_t CodePtToUtf32OnceGetSize(char32_t val)
+		{
+			if (!Internal::IsValidCodePt(val))
+			{
+				throw UtfConversionException("Invalid UTF Code Point" " - "
+					+ std::to_string(val) + " is not a valid UTF code point.");
+			}
+
+			return 1;
 		}
 
 		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt, typename OutputIt>
@@ -565,6 +602,32 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			{
 				begin = UtfConvertOnce(inFunc, outFunc, begin, end, dest);
 			}
+		}
+
+		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt>
+		inline std::pair<size_t, InputIt> UtfConvertOnceGetSize(InBoundFunc inFunc, OutBoundFunc outFunc,
+			InputIt begin, InputIt end)
+		{
+			auto codePtRes = inFunc(begin, end);
+			size_t size = outFunc(codePtRes.first);
+			return std::make_pair(
+				size,
+				codePtRes.second
+			);
+		}
+
+		template<typename InBoundFunc, typename OutBoundFunc, typename InputIt>
+		inline size_t UtfConvertGetSize(InBoundFunc inFunc, OutBoundFunc outFunc,
+			InputIt begin, InputIt end)
+		{
+			size_t size = 0;
+			while (begin != end)
+			{
+				size_t tmp = 0;
+				std::tie(tmp, begin) = UtfConvertOnceGetSize(inFunc, outFunc, begin, end);
+				size += tmp;
+			}
+			return size;
 		}
 
 
@@ -595,6 +658,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				begin, end, dest);
 		}
 
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
+		inline std::pair<size_t, InputIt> Utf8ToUtf16OnceGetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertOnceGetSize(Utf8ToCodePtOnce<InputIt>, CodePtToUtf16OnceGetSize,
+				begin, end);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
+		inline size_t Utf8ToUtf16GetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertGetSize(Utf8ToCodePtOnce<InputIt>, CodePtToUtf16OnceGetSize,
+				begin, end);
+		}
+
 		// ==========  UTF-8 --> UTF-32
 
 		template<typename InputIt, typename OutputIt,
@@ -620,6 +699,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		{
 			return UtfConvertOnce(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32Once<OutputIt>,
 				begin, end, dest);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
+		inline std::pair<size_t, InputIt> Utf8ToUtf32OnceGetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertOnceGetSize(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32OnceGetSize,
+				begin, end);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint8_t), int> = 0>
+		inline size_t Utf8ToUtf32GetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertGetSize(Utf8ToCodePtOnce<InputIt>, CodePtToUtf32OnceGetSize,
+				begin, end);
 		}
 
 		// ==========  UTF-16 --> UTF-8
@@ -649,6 +744,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				begin, end, dest);
 		}
 
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
+		inline std::pair<size_t, InputIt> Utf16ToUtf8OnceGetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertOnceGetSize(Utf16ToCodePtOnce<InputIt>, CodePtToUtf8OnceGetSize,
+				begin, end);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
+		inline size_t Utf16ToUtf8GetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertGetSize(Utf16ToCodePtOnce<InputIt>, CodePtToUtf8OnceGetSize,
+				begin, end);
+		}
+
 		// ==========  UTF-16 --> UTF-32
 
 		template<typename InputIt, typename OutputIt,
@@ -674,6 +785,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		{
 			return UtfConvertOnce(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32Once<OutputIt>,
 				begin, end, dest);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
+		inline std::pair<size_t, InputIt> Utf16ToUtf32OnceGetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertOnceGetSize(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32OnceGetSize,
+				begin, end);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint16_t), int> = 0>
+		inline size_t Utf16ToUtf32GetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertGetSize(Utf16ToCodePtOnce<InputIt>, CodePtToUtf32OnceGetSize,
+				begin, end);
 		}
 
 		// ==========  UTF-32 --> UTF-8
@@ -703,6 +830,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				begin, end, dest);
 		}
 
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
+		inline std::pair<size_t, InputIt> Utf32ToUtf8OnceGetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertOnceGetSize(Utf32ToCodePtOnce<InputIt>, CodePtToUtf8OnceGetSize,
+				begin, end);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
+		inline size_t Utf32ToUtf8GetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertGetSize(Utf32ToCodePtOnce<InputIt>, CodePtToUtf8OnceGetSize,
+				begin, end);
+		}
+
 		// ==========  UTF-32 --> UTF-16
 
 		template<typename InputIt, typename OutputIt,
@@ -728,6 +871,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		{
 			return UtfConvertOnce(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16Once<OutputIt>,
 				begin, end, dest);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
+		inline std::pair<size_t, InputIt> Utf32ToUtf16OnceGetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertOnceGetSize(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16OnceGetSize,
+				begin, end);
+		}
+
+		template<typename InputIt,
+			Internal::EnableIfT<sizeof(typename std::iterator_traits<InputIt>::value_type) >= sizeof(uint32_t), int> = 0>
+		inline size_t Utf32ToUtf16GetSize(InputIt begin, InputIt end)
+		{
+			return UtfConvertGetSize(Utf32ToCodePtOnce<InputIt>, CodePtToUtf16OnceGetSize,
+				begin, end);
 		}
 	}
 }

@@ -116,6 +116,7 @@ GTEST_TEST(TestUtf, CodePtToUtf8)
 				}
 
 				EXPECT_EQ(ref, res);
+				EXPECT_EQ(ref.size(), Internal::CodePtToUtf8OnceGetSize(codePt));
 			}
 		}
 	}
@@ -215,6 +216,7 @@ GTEST_TEST(TestUtf, CodePtToUtf16)
 				}
 
 				EXPECT_EQ(ref, res);
+				EXPECT_EQ(ref.size(), Internal::CodePtToUtf16OnceGetSize(codePt));
 			}
 		}
 	}
@@ -311,6 +313,7 @@ GTEST_TEST(TestUtf, CodePtToUtf32)
 				}
 
 				EXPECT_EQ(codePt, res[0]);
+				EXPECT_EQ(1, Internal::CodePtToUtf32OnceGetSize(codePt));
 			}
 		}
 	}
@@ -390,11 +393,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf16.size(), 0);
 			Internal::Utf8ToUtf16(testUtf8Str.begin(), testUtf8Str.end(), std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str);
+			auto utf16Size = Internal::Utf8ToUtf16GetSize(testUtf8Str.begin(), testUtf8Str.end());
+			EXPECT_EQ(utf16Size, testUtf16Str.size());
 
 			utf16.clear();
 			EXPECT_EQ(utf16.size(), 0);
 			auto utf16It = Internal::Utf8ToUtf16Once(std::begin(testUtf8) + 3, std::begin(testUtf8) + 6, std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str.substr(1, 1));
+			EXPECT_EQ(utf16It, std::begin(testUtf8) + 6);
+			std::tie(utf16Size, utf16It) = Internal::Utf8ToUtf16OnceGetSize(std::begin(testUtf8) + 3, std::begin(testUtf8) + 6);
+			EXPECT_EQ(utf16Size, 1);
 			EXPECT_EQ(utf16It, std::begin(testUtf8) + 6);
 
 			// === UTF-8 --> UTF-32
@@ -405,11 +413,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf32.size(), 0);
 			Internal::Utf8ToUtf32(testUtf8Str.begin(), testUtf8Str.end(), std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str);
+			auto utf32Size = Internal::Utf8ToUtf32GetSize(testUtf8Str.begin(), testUtf8Str.end());
+			EXPECT_EQ(utf32Size, testUtf32Str.size());
 
 			utf32.clear();
 			EXPECT_EQ(utf32.size(), 0);
 			auto utf32It = Internal::Utf8ToUtf32Once(std::begin(testUtf8) + 3, std::begin(testUtf8) + 6, std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str.substr(1, 1));
+			EXPECT_EQ(utf32It, std::begin(testUtf8) + 6);
+			std::tie(utf32Size, utf32It) = Internal::Utf8ToUtf32OnceGetSize(std::begin(testUtf8) + 3, std::begin(testUtf8) + 6);
+			EXPECT_EQ(utf32Size, 1);
 			EXPECT_EQ(utf32It, std::begin(testUtf8) + 6);
 		}
 		{
@@ -421,11 +434,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf8.size(), 0);
 			Internal::Utf16ToUtf8(testUtf16Str.begin(), testUtf16Str.end(), std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str);
+			auto utf8Size = Internal::Utf16ToUtf8GetSize(testUtf16Str.begin(), testUtf16Str.end());
+			EXPECT_EQ(utf8Size, testUtf8Str.size());
 
 			utf8.clear();
 			EXPECT_EQ(utf8.size(), 0);
 			auto utf8It = Internal::Utf16ToUtf8Once(std::begin(testUtf16) + 1, std::begin(testUtf16) + 2, std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str.substr(3, 3));
+			EXPECT_EQ(utf8It, std::begin(testUtf16) + 2);
+			std::tie(utf8Size, utf8It) = Internal::Utf16ToUtf8OnceGetSize(std::begin(testUtf16) + 1, std::begin(testUtf16) + 2);
+			EXPECT_EQ(utf8Size, 3);
 			EXPECT_EQ(utf8It, std::begin(testUtf16) + 2);
 
 			// === UTF-16 --> UTF-32
@@ -436,11 +454,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf32.size(), 0);
 			Internal::Utf16ToUtf32(testUtf16Str.begin(), testUtf16Str.end(), std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str);
+			auto utf32Size = Internal::Utf16ToUtf32GetSize(testUtf16Str.begin(), testUtf16Str.end());
+			EXPECT_EQ(utf32Size, testUtf32Str.size());
 
 			utf32.clear();
 			EXPECT_EQ(utf32.size(), 0);
 			auto utf32It = Internal::Utf16ToUtf32Once(std::begin(testUtf16) + 1, std::begin(testUtf16) + 2, std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str.substr(1, 1));
+			EXPECT_EQ(utf32It, std::begin(testUtf16) + 2);
+			std::tie(utf32Size, utf32It) = Internal::Utf16ToUtf32OnceGetSize(std::begin(testUtf16) + 1, std::begin(testUtf16) + 2);
+			EXPECT_EQ(utf32Size, 1);
 			EXPECT_EQ(utf32It, std::begin(testUtf16) + 2);
 		}
 		{
@@ -452,11 +475,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf8.size(), 0);
 			Internal::Utf32ToUtf8(testUtf32Str.begin(), testUtf32Str.end(), std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str);
+			auto utf8Size = Internal::Utf32ToUtf8GetSize(testUtf32Str.begin(), testUtf32Str.end());
+			EXPECT_EQ(utf8Size, testUtf8Str.size());
 
 			utf8.clear();
 			EXPECT_EQ(utf8.size(), 0);
 			auto utf8It = Internal::Utf32ToUtf8Once(std::begin(testUtf32) + 1, std::begin(testUtf32) + 2, std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str.substr(3, 3));
+			EXPECT_EQ(utf8It, std::begin(testUtf32) + 2);
+			std::tie(utf8Size, utf8It) = Internal::Utf32ToUtf8OnceGetSize(std::begin(testUtf32) + 1, std::begin(testUtf32) + 2);
+			EXPECT_EQ(utf8Size, 3);
 			EXPECT_EQ(utf8It, std::begin(testUtf32) + 2);
 
 			// === UTF-32 --> UTF-16
@@ -467,11 +495,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf16.size(), 0);
 			Internal::Utf32ToUtf16(testUtf32Str.begin(), testUtf32Str.end(), std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str);
+			auto utf16Size = Internal::Utf32ToUtf16GetSize(testUtf32Str.begin(), testUtf32Str.end());
+			EXPECT_EQ(utf16Size, testUtf16Str.size());
 
 			utf16.clear();
 			EXPECT_EQ(utf16.size(), 0);
 			auto utf16It = Internal::Utf32ToUtf16Once(std::begin(testUtf32) + 1, std::begin(testUtf32) + 2, std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str.substr(1, 1));
+			EXPECT_EQ(utf16It, std::begin(testUtf32) + 2);
+			std::tie(utf16Size, utf16It) = Internal::Utf32ToUtf16OnceGetSize(std::begin(testUtf32) + 1, std::begin(testUtf32) + 2);
+			EXPECT_EQ(utf16Size, 1);
 			EXPECT_EQ(utf16It, std::begin(testUtf32) + 2);
 		}
 	}
@@ -492,11 +525,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf16.size(), 0);
 			Internal::Utf8ToUtf16(testUtf8Str.begin(), testUtf8Str.end(), std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str);
+			auto utf16Size = Internal::Utf8ToUtf16GetSize(testUtf8Str.begin(), testUtf8Str.end());
+			EXPECT_EQ(utf16Size, testUtf16Str.size());
 
 			utf16.clear();
 			EXPECT_EQ(utf16.size(), 0);
 			auto utf16It = Internal::Utf8ToUtf16Once(std::begin(testUtf8) + 5, std::begin(testUtf8) + 9, std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str.substr(3, 2));
+			EXPECT_EQ(utf16It, std::begin(testUtf8) + 9);
+			std::tie(utf16Size, utf16It) = Internal::Utf8ToUtf16OnceGetSize(std::begin(testUtf8) + 5, std::begin(testUtf8) + 9);
+			EXPECT_EQ(utf16Size, 2);
 			EXPECT_EQ(utf16It, std::begin(testUtf8) + 9);
 
 			// === UTF-8 --> UTF-32
@@ -507,11 +545,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf32.size(), 0);
 			Internal::Utf8ToUtf32(testUtf8Str.begin(), testUtf8Str.end(), std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str);
+			auto utf32Size = Internal::Utf8ToUtf32GetSize(testUtf8Str.begin(), testUtf8Str.end());
+			EXPECT_EQ(utf32Size, testUtf32Str.size());
 
 			utf32.clear();
 			EXPECT_EQ(utf32.size(), 0);
 			auto utf32It = Internal::Utf8ToUtf32Once(std::begin(testUtf8) + 5, std::begin(testUtf8) + 9, std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str.substr(2, 1));
+			EXPECT_EQ(utf32It, std::begin(testUtf8) + 9);
+			std::tie(utf32Size, utf32It) = Internal::Utf8ToUtf32OnceGetSize(std::begin(testUtf8) + 5, std::begin(testUtf8) + 9);
+			EXPECT_EQ(utf32Size, 1);
 			EXPECT_EQ(utf32It, std::begin(testUtf8) + 9);
 		}
 		{
@@ -523,11 +566,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf8.size(), 0);
 			Internal::Utf16ToUtf8(testUtf16Str.begin(), testUtf16Str.end(), std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str);
+			auto utf8Size = Internal::Utf16ToUtf8GetSize(testUtf16Str.begin(), testUtf16Str.end());
+			EXPECT_EQ(utf8Size, testUtf8Str.size());
 
 			utf8.clear();
 			EXPECT_EQ(utf8.size(), 0);
 			auto utf8It = Internal::Utf16ToUtf8Once(std::begin(testUtf16) + 3, std::begin(testUtf16) + 5, std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str.substr(5, 4));
+			EXPECT_EQ(utf8It, std::begin(testUtf16) + 5);
+			std::tie(utf8Size, utf8It) = Internal::Utf16ToUtf8OnceGetSize(std::begin(testUtf16) + 3, std::begin(testUtf16) + 5);
+			EXPECT_EQ(utf8Size, 4);
 			EXPECT_EQ(utf8It, std::begin(testUtf16) + 5);
 
 			// === UTF-16 --> UTF-32
@@ -538,11 +586,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf32.size(), 0);
 			Internal::Utf16ToUtf32(testUtf16Str.begin(), testUtf16Str.end(), std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str);
+			auto utf32Size = Internal::Utf16ToUtf32GetSize(testUtf16Str.begin(), testUtf16Str.end());
+			EXPECT_EQ(utf32Size, testUtf32Str.size());
 
 			utf32.clear();
 			EXPECT_EQ(utf32.size(), 0);
 			auto utf32It = Internal::Utf16ToUtf32Once(std::begin(testUtf16) + 3, std::begin(testUtf16) + 5, std::back_inserter(utf32));
 			EXPECT_EQ(utf32, testUtf32Str.substr(2, 1));
+			EXPECT_EQ(utf32It, std::begin(testUtf16) + 5);
+			std::tie(utf32Size, utf32It) = Internal::Utf16ToUtf32OnceGetSize(std::begin(testUtf16) + 3, std::begin(testUtf16) + 5);
+			EXPECT_EQ(utf32Size, 1);
 			EXPECT_EQ(utf32It, std::begin(testUtf16) + 5);
 		}
 		{
@@ -554,11 +607,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf8.size(), 0);
 			Internal::Utf32ToUtf8(testUtf32Str.begin(), testUtf32Str.end(), std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str);
+			auto utf8Size = Internal::Utf32ToUtf8GetSize(testUtf32Str.begin(), testUtf32Str.end());
+			EXPECT_EQ(utf8Size, testUtf8Str.size());
 
 			utf8.clear();
 			EXPECT_EQ(utf8.size(), 0);
 			auto utf8It = Internal::Utf32ToUtf8Once(std::begin(testUtf32) + 2, std::begin(testUtf32) + 3, std::back_inserter(utf8));
 			EXPECT_EQ(utf8, testUtf8Str.substr(5, 4));
+			EXPECT_EQ(utf8It, std::begin(testUtf32) + 3);
+			std::tie(utf8Size, utf8It) = Internal::Utf32ToUtf8OnceGetSize(std::begin(testUtf32) + 2, std::begin(testUtf32) + 3);
+			EXPECT_EQ(utf8Size, 4);
 			EXPECT_EQ(utf8It, std::begin(testUtf32) + 3);
 
 			// === UTF-32 --> UTF-16
@@ -569,11 +627,16 @@ GTEST_TEST(TestUtf, Conversion)
 			EXPECT_EQ(utf16.size(), 0);
 			Internal::Utf32ToUtf16(testUtf32Str.begin(), testUtf32Str.end(), std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str);
+			auto utf16Size = Internal::Utf32ToUtf16GetSize(testUtf32Str.begin(), testUtf32Str.end());
+			EXPECT_EQ(utf16Size, testUtf16Str.size());
 
 			utf16.clear();
 			EXPECT_EQ(utf16.size(), 0);
 			auto utf16It = Internal::Utf32ToUtf16Once(std::begin(testUtf32) + 2, std::begin(testUtf32) + 3, std::back_inserter(utf16));
 			EXPECT_EQ(utf16, testUtf16Str.substr(3, 2));
+			EXPECT_EQ(utf16It, std::begin(testUtf32) + 3);
+			std::tie(utf16Size, utf16It) = Internal::Utf32ToUtf16OnceGetSize(std::begin(testUtf32) + 2, std::begin(testUtf32) + 3);
+			EXPECT_EQ(utf16Size, 2);
 			EXPECT_EQ(utf16It, std::begin(testUtf32) + 3);
 		}
 	}
