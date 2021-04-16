@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <iterator>
 
 #include "Exceptions.hpp"
 
@@ -118,7 +119,19 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		virtual DataTypes GetDataType() const noexcept = 0;
 
-		virtual std::string ToString(const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const = 0;
+		virtual void ToString(std::back_insert_iterator<std::string> dest,
+			const std::string& indent = "", const std::string& lineEnd = "\n",
+			bool sortKeys = false, size_t nestLevel = 0,
+			bool addComma = false) const = 0;
+
+		virtual std::string ToString(const std::string& indent = "",
+			const std::string& lineEnd = "\n", bool sortKeys = false,
+			size_t nestLevel = 0, bool addComma = false) const
+		{
+			std::string res;
+			ToString(std::back_inserter(res), indent, lineEnd, sortKeys, nestLevel, addComma);
+			return res;
+		}
 
 	protected:
 

@@ -209,11 +209,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return DataTypes::Boolean;
 		}
 
-		virtual std::string ToString(const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const override
+		virtual void ToString(std::back_insert_iterator<std::string> dest,
+			const std::string& indent = "", const std::string& lineEnd = "\n",
+			bool sortKeys = false, size_t nestLevel = 0,
+			bool addComma = false) const override
 		{
-			std::string res;
-			_TypeBase::ToString(std::back_inserter(res), indent, lineEnd, sortKeys, nestLevel, addComma);
-			return res;
+			_TypeBase::ToString(dest, indent, lineEnd, sortKeys, nestLevel, addComma);
 		}
 
 	protected:
