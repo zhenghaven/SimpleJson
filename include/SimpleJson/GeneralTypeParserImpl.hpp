@@ -5,6 +5,7 @@
 #include "NullTypeParser.hpp"
 #include "BoolTypeParser.hpp"
 #include "ArrayTypeParser.hpp"
+#include "StringTypeParser.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -49,6 +50,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					return ArrayTypeParser<InputIt>().ParsePartial(begin, end, oriPos);
 				case '{':   // {}     -- Object
 				case '\"':  // "..."  -- String
+					return StringTypeParser<InputIt>().ParsePartial(begin, end, oriPos);
 				default:
 					break;
 			}

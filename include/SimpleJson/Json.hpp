@@ -24,6 +24,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 	class ArrayType;
 	class ObjType;
+	class StringType;
 
 	class Json
 	{
@@ -38,14 +39,24 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		virtual ~Json()
 		{}
 
-		virtual std::string& GetString()
+		virtual StringType& GetString()
 		{
 			throw OperationUnsupportedException(GetTypeName(), "GetString");
 		}
 
-		virtual const std::string& GetString() const
+		virtual const StringType& GetString() const
 		{
 			throw OperationUnsupportedException(GetTypeName(), "GetString");
+		}
+
+		virtual std::string& GetUtf8String()
+		{
+			throw OperationUnsupportedException(GetTypeName(), "GetUtf8String");
+		}
+
+		virtual const std::string& GetUtf8String() const
+		{
+			throw OperationUnsupportedException(GetTypeName(), "GetUtf8String");
 		}
 
 		virtual int8_t GetInt8() const

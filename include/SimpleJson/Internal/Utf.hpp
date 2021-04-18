@@ -189,6 +189,19 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		static_assert(!IsAscii('\x80'), "Programming Error");
 		static_assert(!IsAscii(~static_cast<int8_t>(0)), "Programming Error");
 
+		template<typename ValType>
+		inline constexpr bool IsPrintableAscii(ValType val)
+		{
+			return IsAscii(val) && (0x20 <= static_cast<uint8_t>(val) && static_cast<uint8_t>(val) <= 0x7E);
+		}
+		static_assert(IsPrintableAscii('a'), "Programming Error");
+		static_assert(IsPrintableAscii(' '), "Programming Error");
+		static_assert(IsPrintableAscii('~'), "Programming Error");
+		static_assert(!IsPrintableAscii('\0'), "Programming Error");
+		static_assert(!IsPrintableAscii('\n'), "Programming Error");
+		static_assert(!IsPrintableAscii('\x7f'), "Programming Error");
+		static_assert(!IsPrintableAscii('\x80'), "Programming Error");
+
 		namespace Internal
 		{
 			inline size_t CalcUtf8NumContNeeded(char32_t val)
