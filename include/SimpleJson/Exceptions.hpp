@@ -144,7 +144,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		}
 
 		template<typename InputIt>
-		static std::string ConErrorMsg(const char* issue, InputIt oriPos, InputIt end)
+		static std::string ConErrorMsg(const std::string& issue, InputIt oriPos, InputIt end)
 		{
 			size_t lineNum = 0;
 			size_t colNum = 0;
@@ -167,7 +167,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		 * @param  end     The position where error occurred.
 		 */
 		template<typename InputIt>
-		ParseError(const char* issue, InputIt oriPos, InputIt end) :
+		ParseError(const std::string& issue, InputIt oriPos, InputIt end) :
 			Exception(ConErrorMsg(issue, oriPos, end))
 		{}
 

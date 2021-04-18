@@ -16,36 +16,38 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		template<typename InputIt>
 		static std::pair<Bool, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
-			constexpr char const expectedTrueStr[] = "true";
-			constexpr char const expectedFalseStr[] = "false";
-			constexpr size_t expectedTrueLen = sizeof(expectedTrueStr) - 1;
-			constexpr size_t expectedFalseLen = sizeof(expectedFalseStr) - 1;
-
-			begin = Parser::SkipLeadingSpace(begin, end);
-			auto dist = std::distance(begin, end);
-
-			if (dist >= expectedTrueLen &&
-				std::equal(std::begin(expectedTrueStr), std::begin(expectedTrueStr) + expectedTrueLen, begin))
+			auto firstCh = Parser::NextChar(begin, end, oriPos);
+			if (firstCh == 't')
 			{
-				begin = Parser::SkipLeadingSpace(begin + expectedTrueLen, end);
+				if (Parser::NextChar(begin, end, oriPos) == 'r' &&
+					Parser::NextChar(begin, end, oriPos) == 'u' &&
+					Parser::NextChar(begin, end, oriPos) == 'e')
+				{
+					begin = Parser::SkipLeadingSpace(begin, end);
 
-				return std::make_pair(
-					Bool(true),
-					begin
-				);
+					return std::make_pair(
+						Bool(true),
+						begin
+					);
+				}
 			}
-			else if (dist >= expectedFalseLen &&
-				std::equal(std::begin(expectedFalseStr), std::begin(expectedFalseStr) + expectedFalseLen, begin))
+			else if (firstCh == 'f')
 			{
-				begin = Parser::SkipLeadingSpace(begin + expectedFalseLen, end);
+				if (Parser::NextChar(begin, end, oriPos) == 'a' &&
+					Parser::NextChar(begin, end, oriPos) == 'l' &&
+					Parser::NextChar(begin, end, oriPos) == 's' &&
+					Parser::NextChar(begin, end, oriPos) == 'e')
+				{
+					begin = Parser::SkipLeadingSpace(begin, end);
 
-				return std::make_pair(
-					Bool(false),
-					begin
-				);
+					return std::make_pair(
+						Bool(false),
+						begin
+					);
+				}
 			}
 
-			throw ParseError("Unexpected string", oriPos, begin);
+			throw ParseError("Unexpected character", oriPos, begin);
 		}
 
 		template<typename InputIt>

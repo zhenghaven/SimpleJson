@@ -16,15 +16,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		template<typename InputIt>
 		static std::pair<Null, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
-			constexpr char const expectedStr[] = "null";
-			constexpr size_t expectedLen = sizeof(expectedStr) - 1;
-
-			begin = Parser::SkipLeadingSpace(begin, end);
-
-			if (std::distance(begin, end) >= expectedLen &&
-				std::equal(std::begin(expectedStr), std::begin(expectedStr) + expectedLen, begin))
+			if (Parser::NextChar(begin, end, oriPos) == 'n' &&
+				Parser::NextChar(begin, end, oriPos) == 'u' &&
+				Parser::NextChar(begin, end, oriPos) == 'l' &&
+				Parser::NextChar(begin, end, oriPos) == 'l')
 			{
-				begin = Parser::SkipLeadingSpace(begin + expectedLen, end);
+				begin = Parser::SkipLeadingSpace(begin, end);
 
 				return std::make_pair(
 					Null(),
@@ -32,7 +29,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				);
 			}
 
-			throw ParseError("Unexpected string", oriPos, begin);
+			throw ParseError("Unexpected character", oriPos, begin);
 		}
 
 		template<typename InputIt>
@@ -50,6 +47,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 			return res;
 		}
+
+	public:
+		Null() = default;
+
+		virtual ~Null()
+		{}
 
 		template<typename OutputIt>
 		void ToString(OutputIt dest, const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
@@ -69,12 +72,6 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				std::copy(lineEnd.begin(), lineEnd.end(), dest);
 			}
 		}
-
-	public:
-		Null() = default;
-
-		virtual ~Null()
-		{}
 	};
 
 	class NullType : public Json, public Null
