@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Json.hpp"
-#include "ParserHelpers.hpp"
+
+#include "Internal/ParserHelpers.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -16,14 +17,14 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		template<typename InputIt>
 		static std::pair<Bool, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
-			auto firstCh = Parser::NextChar(begin, end, oriPos);
+			auto firstCh = Parser::Internal::NextChar(begin, end, oriPos);
 			if (firstCh == 't')
 			{
-				if (Parser::NextChar(begin, end, oriPos) == 'r' &&
-					Parser::NextChar(begin, end, oriPos) == 'u' &&
-					Parser::NextChar(begin, end, oriPos) == 'e')
+				if (Parser::Internal::NextChar(begin, end, oriPos) == 'r' &&
+					Parser::Internal::NextChar(begin, end, oriPos) == 'u' &&
+					Parser::Internal::NextChar(begin, end, oriPos) == 'e')
 				{
-					begin = Parser::SkipLeadingSpace(begin, end);
+					begin = Parser::Internal::SkipLeadingSpace(begin, end);
 
 					return std::make_pair(
 						Bool(true),
@@ -33,12 +34,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 			else if (firstCh == 'f')
 			{
-				if (Parser::NextChar(begin, end, oriPos) == 'a' &&
-					Parser::NextChar(begin, end, oriPos) == 'l' &&
-					Parser::NextChar(begin, end, oriPos) == 's' &&
-					Parser::NextChar(begin, end, oriPos) == 'e')
+				if (Parser::Internal::NextChar(begin, end, oriPos) == 'a' &&
+					Parser::Internal::NextChar(begin, end, oriPos) == 'l' &&
+					Parser::Internal::NextChar(begin, end, oriPos) == 's' &&
+					Parser::Internal::NextChar(begin, end, oriPos) == 'e')
 				{
-					begin = Parser::SkipLeadingSpace(begin, end);
+					begin = Parser::Internal::SkipLeadingSpace(begin, end);
 
 					return std::make_pair(
 						Bool(false),

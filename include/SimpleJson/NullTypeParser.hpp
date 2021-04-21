@@ -34,7 +34,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				std::tie(res, nextBegin) = Null::ParsePartial(begin, end, oriPos);
 
 				return std::make_pair(
-					Internal::make_unique<NullType>(std::move(res)),
+					MakeUniquePtr::make_unique<NullType>(std::move(res)),
 					nextBegin
 				);
 			}
@@ -43,7 +43,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				InputIt begin, InputIt end
 			) const override
 			{
-				return Internal::make_unique<NullType>(Null::Parse(begin, end));
+				return MakeUniquePtr::make_unique<NullType>(Null::Parse(begin, end));
 			}
 		};
 	}

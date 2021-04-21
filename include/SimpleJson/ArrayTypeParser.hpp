@@ -33,7 +33,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				std::tie(res, begin) = ArrayType::_TypeBase::ParsePartial(begin, end, oriPos);
 
 				return std::make_pair(
-					Internal::make_unique<ArrayType>(std::move(res)),
+					MakeUniquePtr::make_unique<ArrayType>(std::move(res)),
 					begin
 				);
 			}
@@ -42,7 +42,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				InputIt begin, InputIt end
 			) const override
 			{
-				return Internal::make_unique<ArrayType>(ArrayType::_TypeBase::Parse(begin, end));
+				return MakeUniquePtr::make_unique<ArrayType>(ArrayType::_TypeBase::Parse(begin, end));
 			}
 		};
 	}

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Json.hpp"
-#include "ParserHelpers.hpp"
 
+#include "Internal/ParserHelpers.hpp"
 #include "Internal/Utf.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
@@ -42,12 +42,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		{
 			StringCtnType resStr;
 
-			if (Parser::NextChar(begin, end, oriPos) == '\"')
+			if (Parser::Internal::NextChar(begin, end, oriPos) == '\"')
 			{
 				bool isEnd = false;
 				while (!isEnd)
 				{
-					auto ch = Parser::ImmdPeekChar(begin, end, oriPos);
+					auto ch = Parser::Internal::ImmdPeekChar(begin, end, oriPos);
 					if (ch == '\"') // Ending
 					{
 						++begin;
@@ -56,7 +56,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					else if (ch == '\\') // Escape something
 					{
 						++begin;
-						ch = Parser::ImmdNextChar(begin, end, oriPos);
+						ch = Parser::Internal::ImmdNextChar(begin, end, oriPos);
 						switch (ch)
 						{
 						case '\"':
@@ -115,7 +115,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					}
 				}
 
-				begin = Parser::SkipLeadingSpace(begin, end);
+				begin = Parser::Internal::SkipLeadingSpace(begin, end);
 				return std::make_pair(
 					std::move(resStr),
 					begin
@@ -148,7 +148,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			{
 				res <<= 4;
 
-				auto ch = Parser::ImmdNextChar(begin, end, oriPos);
+				auto ch = Parser::Internal::ImmdNextChar(begin, end, oriPos);
 				uint8_t tmp = 0;
 				switch (ch)
 				{
@@ -199,8 +199,8 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			std::u16string utf16(1, first);
 
 			auto tmpBegin = begin;
-			while (Parser::ImmdNextChar(tmpBegin, end, oriPos) == '\\' &&
-				Parser::ImmdNextChar(tmpBegin, end, oriPos) == 'u') // Do we have more UTF-16 to parse?
+			while (Parser::Internal::ImmdNextChar(tmpBegin, end, oriPos) == '\\' &&
+				Parser::Internal::ImmdNextChar(tmpBegin, end, oriPos) == 'u') // Do we have more UTF-16 to parse?
 			{
 				begin = tmpBegin;
 

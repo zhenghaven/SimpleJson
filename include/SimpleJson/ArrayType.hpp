@@ -3,8 +3,9 @@
 #include <vector>
 
 #include "Json.hpp"
-#include "ParserHelpers.hpp"
 #include "CntValProxy.hpp"
+
+#include "Internal/ParserHelpers.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -44,23 +45,14 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		template<typename InputIt>
 		static std::pair<Vector, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
-			begin = Parser::SkipLeadingSpace(begin, end);
-
-			if (begin != end && *begin == '[')
+			if (Parser::Internal::NextChar(begin, end, oriPos) == '[')
 			{
-				++begin;
-				begin = Parser::SkipLeadingSpace(begin, end);
-
 				Vector res;
 				bool isEnd = false;
 
 				while(!isEnd)
 				{
-					if (begin == end)
-					{
-						throw ParseError("Unexpected ending", oriPos, begin);
-					}
-					else if (*begin == ']')
+					if (Parser::Internal::PeekChar(begin, end, oriPos) == ']')
 					{
 						++begin;
 						isEnd = true;
@@ -73,29 +65,22 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 						res.emplace_back(std::move(val));
 
-						begin = Parser::SkipLeadingSpace(begin, end);
-
-						if (begin == end)
+						auto tmpCh = Parser::Internal::NextChar(begin, end, oriPos);
+						switch (tmpCh)
 						{
-							throw ParseError("Unexpected ending", oriPos, begin);
-						}
-						else if (*begin == ',')
-						{
-							++begin;
-						}
-						else if (*begin == ']')
-						{
-							++begin;
+						case ',':
+							break;
+						case ']':
 							isEnd = true;
-						}
-						else
-						{
+							break;
+
+						default:
 							throw ParseError("Unexpected string", oriPos, begin);
 						}
 					}
-					begin = Parser::SkipLeadingSpace(begin, end);
 				}
 
+				begin = Parser::Internal::SkipLeadingSpace(begin, end);
 				return std::make_pair(
 					std::move(res),
 					begin

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Json.hpp"
-#include "ParserHelpers.hpp"
+
+#include "Internal/ParserHelpers.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -16,12 +17,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		template<typename InputIt>
 		static std::pair<Null, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
-			if (Parser::NextChar(begin, end, oriPos) == 'n' &&
-				Parser::NextChar(begin, end, oriPos) == 'u' &&
-				Parser::NextChar(begin, end, oriPos) == 'l' &&
-				Parser::NextChar(begin, end, oriPos) == 'l')
+			if (Parser::Internal::NextChar(begin, end, oriPos) == 'n' &&
+				Parser::Internal::NextChar(begin, end, oriPos) == 'u' &&
+				Parser::Internal::NextChar(begin, end, oriPos) == 'l' &&
+				Parser::Internal::NextChar(begin, end, oriPos) == 'l')
 			{
-				begin = Parser::SkipLeadingSpace(begin, end);
+				begin = Parser::Internal::SkipLeadingSpace(begin, end);
 
 				return std::make_pair(
 					Null(),

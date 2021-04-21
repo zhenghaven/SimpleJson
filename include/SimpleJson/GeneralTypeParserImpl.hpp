@@ -37,7 +37,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			InputIt begin, InputIt end, const InputIt oriPos
 		) const
 		{
-			begin = SkipLeadingSpace(begin, end);
+			begin = Internal::SkipLeadingSpace(begin, end);
 
 			switch(*begin)
 			{

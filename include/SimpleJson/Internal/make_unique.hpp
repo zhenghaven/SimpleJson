@@ -25,7 +25,7 @@ namespace SimpleJson
 namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 #endif
 {
-	namespace Internal
+	namespace MakeUniquePtr
 	{
 		template<class _Tp>
 		struct __unique_if
