@@ -15,7 +15,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		namespace Internal
 		{
 			template<typename InputIt>
-			bool IsSpace(InputIt it)
+			inline bool IsSpace(InputIt it)
 			{
 				return (*it == ' ') ||
 					(*it == '\r') ||
@@ -26,7 +26,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 
 			template<typename InputIt>
-			InputIt SkipLeadingSpace(InputIt begin, InputIt end)
+			inline InputIt SkipLeadingSpace(InputIt begin, InputIt end)
 			{
 				while(begin != end && IsSpace(begin))
 				{
@@ -37,6 +37,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 
 			template<typename InputIt>
+			inline
 			typename std::iterator_traits<InputIt>::value_type
 			NextChar(InputIt& begin, InputIt end, const InputIt oriPos)
 			{
@@ -49,6 +50,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 
 			template<typename InputIt>
+			inline
 			typename std::iterator_traits<InputIt>::value_type
 			PeekChar(InputIt& begin, InputIt end, const InputIt oriPos)
 			{
@@ -61,6 +63,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 
 			template<typename InputIt>
+			inline
 			typename std::iterator_traits<InputIt>::value_type
 			ImmdNextChar(InputIt& begin, InputIt end, const InputIt oriPos)
 			{
@@ -72,6 +75,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			}
 
 			template<typename InputIt>
+			inline
 			typename std::iterator_traits<InputIt>::value_type
 			ImmdPeekChar(InputIt& begin, InputIt end, const InputIt oriPos)
 			{
