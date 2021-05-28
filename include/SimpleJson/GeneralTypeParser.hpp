@@ -24,10 +24,6 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				InputIt begin, InputIt end, const InputIt oriPos
 			) const;
 
-			virtual bool IsNumerical(
-				InputIt begin, InputIt end
-			) const;
-
 			virtual std::pair<std::unique_ptr<Json>, InputIt> ParsePartial(
 				InputIt begin, InputIt end, const InputIt oriPos
 			) const override;

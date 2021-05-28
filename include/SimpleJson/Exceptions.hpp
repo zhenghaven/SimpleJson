@@ -143,14 +143,8 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return std::make_pair(lineNum, colNum);
 		}
 
-		template<typename InputIt>
-		static std::string ConErrorMsg(const std::string& issue, InputIt oriPos, InputIt end)
+		static std::string ConErrorMsg(const std::string& issue, size_t lineNum, size_t colNum)
 		{
-			size_t lineNum = 0;
-			size_t colNum = 0;
-
-			std::tie(lineNum, colNum) = CalcLineCol(oriPos, end);
-
 			return std::string("Parse error - ") + issue +
 				": line " + std::to_string(lineNum + 1) + " column " + std::to_string(colNum + 1) + ".";
 		}
@@ -168,7 +162,21 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		 */
 		template<typename InputIt>
 		ParseError(const std::string& issue, InputIt oriPos, InputIt end) :
-			Exception(ConErrorMsg(issue, oriPos, end))
+			ParseError(issue, CalcLineCol(oriPos, end))
+		{}
+
+		ParseError(const std::string& issue, std::pair<size_t, size_t> lineColNum) :
+			Exception(issue),
+			m_lineNum(lineColNum.first),
+			m_colNum(lineColNum.second),
+			m_errMsg(ConErrorMsg(issue, lineColNum.first, lineColNum.second))
+		{}
+
+		ParseError(const std::string& issue) :
+			Exception(issue),
+			m_lineNum(0),
+			m_colNum(0),
+			m_errMsg()
 		{}
 
 		/**
@@ -177,6 +185,21 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		 */
 		virtual ~ParseError()
 		{}
+
+		virtual void SetLineColNumber(size_t lineNum, size_t colNum)
+		{
+			m_lineNum = lineNum;
+			m_colNum = colNum;
+
+			m_errMsg = ConErrorMsg(Exception::what(), m_lineNum, m_colNum);
+		}
+
+	private:
+
+		size_t m_lineNum;
+		size_t m_colNum;
+
+		std::string m_errMsg;
 	};
 
 	/**
@@ -215,6 +238,45 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		 *
 		 */
 		virtual ~InvalidArgumentException()
+		{}
+	};
+
+	/**
+	 * @brief An exception class that is thrown when the result of a computation
+	 *        cannot be represented by the destination type
+	 *
+	 */
+	class RangeErrorException : public Exception
+	{
+	public:
+
+		/**
+		 * @brief Construct a new Range Error Exception object
+		 *
+		 * @param what_arg explanatory string
+		 */
+		RangeErrorException(const char* what_arg) :
+			Exception(what_arg)
+		{}
+
+		/**
+		 * @brief Construct a new Range Error Exception object
+		 *
+		 * @param what_arg explanatory string
+		 */
+		RangeErrorException(const std::string& what_arg) :
+			Exception(what_arg)
+		{}
+
+		RangeErrorException(const RangeErrorException& other) noexcept :
+			Exception(other)
+		{}
+
+		/**
+		 * @brief Destroy the Range Error Exception object
+		 *
+		 */
+		virtual ~RangeErrorException()
 		{}
 	};
 }

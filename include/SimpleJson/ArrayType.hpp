@@ -346,7 +346,10 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		}
 
 		template<typename OutputIt>
-		void ToString(OutputIt dest, const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+		void ToString(OutputIt dest,
+			const std::string& indent = "", const std::string& lineEnd = "\n",
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const
 		{
 			constexpr char lbrStr[] = "[";
 			constexpr char rbrStr[] = "]";
@@ -370,12 +373,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					{
 						//res += appIndent + indent + m_data[i].ToString(indent, lineEnd, sortKeys, nestLevel + 1, true);
 						RepeatOutput(dest, indent, nestLevel + 1);
-						m_data[i].ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, true);
+						m_data[i].ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel + 1, true);
 					}
 
 					//res += appIndent + indent + m_data.back().ToString(indent, lineEnd, sortKeys, nestLevel + 1, false);
 					RepeatOutput(dest, indent, nestLevel + 1);
-					m_data.back().ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, false);
+					m_data.back().ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel + 1, false);
 
 					//res += appIndent + ']' + (addComma ? "," : "") + lineEnd;
 					RepeatOutput(dest, indent, nestLevel);
@@ -406,13 +409,13 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				for (size_t i = 0; m_data.size() > 0 && i < m_data.size() - 1; ++i)
 				{
 					//res += m_data[i].ToString(indent, lineEnd, sortKeys, nestLevel + 1, true);
-					m_data[i].ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, true);
+					m_data[i].ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel + 1, true);
 				}
 
 				if (m_data.size() > 0)
 				{
 					//res += m_data.back().ToString(indent, lineEnd, sortKeys, nestLevel + 1, false);
-					m_data.back().ToString(dest, indent, lineEnd, sortKeys, nestLevel + 1, false);
+					m_data.back().ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel + 1, false);
 				}
 
 				//res = res + ']' + (addComma ? "," : "");
@@ -493,10 +496,10 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		virtual void ToString(std::back_insert_iterator<std::string> dest,
 			const std::string& indent = "", const std::string& lineEnd = "\n",
-			bool sortKeys = false, size_t nestLevel = 0,
-			bool addComma = false) const override
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const override
 		{
-			_TypeBase::ToString(dest, indent, lineEnd, sortKeys, nestLevel, addComma);
+			_TypeBase::ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel, addComma);
 		}
 
 	protected:

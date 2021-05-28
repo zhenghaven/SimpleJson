@@ -1,3 +1,4 @@
+// Parser definition refers to: https://tools.ietf.org/id/draft-ietf-json-rfc4627bis-09.html
 #pragma once
 
 #include "Json.hpp"
@@ -530,7 +531,10 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		}
 
 		template<typename OutputIt>
-		void ToString(OutputIt dest, const std::string& indent = "", const std::string& lineEnd = "\n", bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+		void ToString(OutputIt dest,
+			const std::string& indent = "", const std::string& lineEnd = "\n",
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const
 		{
 			constexpr char quoteStr[] = "\"";
 			constexpr char escStr[] = "\\";
@@ -747,10 +751,10 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		virtual void ToString(std::back_insert_iterator<std::string> dest,
 			const std::string& indent = "", const std::string& lineEnd = "\n",
-			bool sortKeys = false, size_t nestLevel = 0,
-			bool addComma = false) const override
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const override
 		{
-			_TypeBase::ToString(dest, indent, lineEnd, sortKeys, nestLevel, addComma);
+			_TypeBase::ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel, addComma);
 		}
 
 	protected:

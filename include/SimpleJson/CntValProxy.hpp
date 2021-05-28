@@ -124,24 +124,27 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		std::string ToString(
 			const std::string& indent = "", const std::string& lineEnd = "\n",
-			bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const
 		{
-			return m_data->ToString(indent, lineEnd, sortKeys, nestLevel, addComma);
+			return m_data->ToString(indent, lineEnd, sortKeys, precision, nestLevel, addComma);
 		}
 
 		void ToString(std::back_insert_iterator<std::string> dest,
 			const std::string& indent = "", const std::string& lineEnd = "\n",
-			bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const
 		{
-			return m_data->ToString(dest, indent, lineEnd, sortKeys, nestLevel, addComma);
+			return m_data->ToString(dest, indent, lineEnd, sortKeys, precision, nestLevel, addComma);
 		}
 
 		template<typename OutputIt>
 		void ToString(OutputIt dest,
 			const std::string& indent = "", const std::string& lineEnd = "\n",
-			bool sortKeys = false, size_t nestLevel = 0, bool addComma = false) const
+			bool sortKeys = false,  size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const
 		{
-			std::string tmp = m_data->ToString(indent, lineEnd, sortKeys, nestLevel, addComma);
+			std::string tmp = m_data->ToString(indent, lineEnd, sortKeys, precision, nestLevel, addComma);
 			std::copy(tmp.begin(), tmp.end(), dest);
 		}
 

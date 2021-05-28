@@ -6,6 +6,7 @@
 #include <string>
 #include <iterator>
 
+#include "Config.hpp"
 #include "Exceptions.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
@@ -20,6 +21,8 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		String,
 		Boolean,
 		Array,
+		Integer,
+		Real,
 	};
 
 	class ArrayType;
@@ -36,8 +39,27 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 	public:
 		Json() = default;
 
+		// Json()
+		// {}
+
+		// Json(const Json& other)
+		// {}
+
+		// Json(Json&& other)
+		// {}
+
 		virtual ~Json()
 		{}
+
+		// Json& operator=(const Json& rhs)
+		// {
+		// 	return *this;
+		// }
+
+		// Json& operator=(Json&& rhs)
+		// {
+		// 	return *this;
+		// }
 
 		virtual StringType& GetString()
 		{
@@ -59,49 +81,56 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			throw OperationUnsupportedException(GetTypeName(), "GetUtf8String");
 		}
 
-		virtual int8_t GetInt8() const
+		virtual const DefaultIntType& GetInt() const
 		{
-			throw OperationUnsupportedException(GetTypeName(), "GetInt8");
+			throw OperationUnsupportedException(GetTypeName(), "GetInt");
 		}
 
-		virtual uint8_t GetUInt8() const
+		virtual DefaultIntType& GetInt()
 		{
-			throw OperationUnsupportedException(GetTypeName(), "GetUInt8");
+			throw OperationUnsupportedException(GetTypeName(), "GetInt");
 		}
 
-		virtual int16_t GetInt16() const
+		template<typename _TargetType>
+		_TargetType GetIntCasted() const
 		{
-			throw OperationUnsupportedException(GetTypeName(), "GetInt16");
+			const DefaultIntType& tmp = GetInt();
+
+			if (std::numeric_limits<_TargetType>::lowest() <= tmp &&
+				tmp <= std::numeric_limits<_TargetType>::max())
+			{
+				return _TargetType(tmp);
+			}
+			else
+			{
+				throw RangeErrorException("The value stored is out side of the range of the given target type.");
+			}
 		}
 
-		virtual uint16_t GetUInt16() const
-		{
-			throw OperationUnsupportedException(GetTypeName(), "GetUInt16");
-		}
-
-		virtual int32_t GetInt32() const
-		{
-			throw OperationUnsupportedException(GetTypeName(), "GetInt32");
-		}
-
-		virtual uint32_t GetUInt32() const
-		{
-			throw OperationUnsupportedException(GetTypeName(), "GetUInt32");
-		}
-
-		virtual int64_t GetInt64() const
-		{
-			throw OperationUnsupportedException(GetTypeName(), "GetInt64");
-		}
-
-		virtual uint64_t GetUInt64() const
-		{
-			throw OperationUnsupportedException(GetTypeName(), "GetUInt64");
-		}
-
-		virtual double GetReal() const
+		virtual const DefaultRealType& GetReal() const
 		{
 			throw OperationUnsupportedException(GetTypeName(), "GetReal");
+		}
+
+		virtual DefaultRealType& GetReal()
+		{
+			throw OperationUnsupportedException(GetTypeName(), "GetReal");
+		}
+
+		template<typename _TargetType>
+		_TargetType GetRealCasted() const
+		{
+			const DefaultRealType& tmp = GetReal();
+
+			if (std::numeric_limits<_TargetType>::lowest() > tmp ||
+				tmp > std::numeric_limits<_TargetType>::max() ||
+				(tmp > 0 && tmp < std::numeric_limits<_TargetType>::min()) ||
+				(tmp < 0 && tmp > -std::numeric_limits<_TargetType>::min()))
+			{
+				throw RangeErrorException("The value stored is out side of the range of the given target type.");
+			}
+
+			return _TargetType(tmp);
 		}
 
 		virtual bool GetBool() const
@@ -132,15 +161,19 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		virtual void ToString(std::back_insert_iterator<std::string> dest,
 			const std::string& indent = "", const std::string& lineEnd = "\n",
-			bool sortKeys = false, size_t nestLevel = 0,
-			bool addComma = false) const = 0;
+			bool sortKeys = gk_defaultSortKeys, size_t precision = gk_defaultRealPrecision,
+			size_t nestLevel = 0, bool addComma = false) const = 0;
 
-		virtual std::string ToString(const std::string& indent = "",
-			const std::string& lineEnd = "\n", bool sortKeys = false,
+		virtual std::string ToString(
+			const std::string& indent = "", const std::string& lineEnd = "\n",
+			bool sortKeys = false, size_t precision = gk_defaultRealPrecision,
 			size_t nestLevel = 0, bool addComma = false) const
 		{
 			std::string res;
-			ToString(std::back_inserter(res), indent, lineEnd, sortKeys, nestLevel, addComma);
+			ToString(std::back_inserter(res),
+				indent, lineEnd,
+				sortKeys, precision,
+				nestLevel, addComma);
 			return res;
 		}
 
