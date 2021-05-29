@@ -11,6 +11,8 @@
 #include "ArrayType.hpp"
 #include "StringType.hpp"
 
+#include "StaticObject.hpp"
+
 #include "NullTypeParser.hpp"
 #include "BoolTypeParser.hpp"
 #include "IntegerTypeParser.hpp"

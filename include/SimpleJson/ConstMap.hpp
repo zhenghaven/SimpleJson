@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <stdexcept>
 #include <type_traits>
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
@@ -50,6 +51,81 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 	// Const Map
 	struct ConstMapError {};
 
+	namespace Internal
+	{
+		template<
+			typename _OutValType,
+			typename _SelfKeyType,
+			typename _SelfValType,
+			typename _NextPairType,
+			typename _GivenKeyType
+		>
+		struct MemberGetterHelper
+		{
+			static
+			typename std::add_lvalue_reference<_OutValType>::type
+			Get(
+				typename std::add_lvalue_reference<_SelfValType>::type selfVal,
+				typename std::add_lvalue_reference<_NextPairType>::type nextPair
+			)
+			{
+				return nextPair.template GetVal<_GivenKeyType>();
+			}
+
+			static
+			typename std::add_lvalue_reference<
+				typename std::add_const<_OutValType>::type>::type
+			Get(
+				typename std::add_lvalue_reference<
+					typename std::add_const<_SelfValType>::type>::type selfVal,
+				typename std::add_lvalue_reference<
+					typename std::add_const<_NextPairType>::type>::type nextPair
+			)
+			{
+				return nextPair.template GetVal<_GivenKeyType>();
+			}
+		};
+
+		template<
+			typename _OutValType,
+			typename _SelfKeyType,
+			typename _SelfValType,
+			typename _NextPairType
+		>
+		struct MemberGetterHelper<
+			_OutValType,
+			_SelfKeyType,
+			_SelfValType,
+			_NextPairType,
+			_SelfKeyType
+		>
+		{
+			static
+			typename std::add_lvalue_reference<_OutValType>::type
+			Get(
+				typename std::add_lvalue_reference<_SelfValType>::type selfVal,
+				typename std::add_lvalue_reference<_NextPairType>::type nextPair
+			)
+			{
+				return selfVal;
+			}
+
+			static
+			typename std::add_lvalue_reference<
+				typename std::add_const<_OutValType>::type>::type
+			Get(
+				typename std::add_lvalue_reference<
+					typename std::add_const<_SelfValType>::type>::type selfVal,
+				typename std::add_lvalue_reference<
+					typename std::add_const<_NextPairType>::type>::type nextPair
+			)
+			{
+				return selfVal;
+			}
+		};
+
+	}
+
 	template<typename... _Pairs>
 	struct ConstMap : ConstMapError {};
 
@@ -69,6 +145,41 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		using HasKey = std::is_same<_KeyType, _OtherKeyType>;
 
 		using HasDupKey = std::false_type;
+
+		template<typename _OtherKeyType>
+		typename std::add_lvalue_reference<
+			FindValType<_OtherKeyType>
+		>::type
+		GetVal()
+		{
+			return Internal::MemberGetterHelper<
+				FindValType<_OtherKeyType>,
+				_KeyType,
+				_ValType,
+				ConstMapError,
+				_OtherKeyType
+			>::Get(m_val, m_null);
+		}
+
+		template<typename _OtherKeyType>
+		typename std::add_lvalue_reference<
+			typename std::add_const<
+				FindValType<_OtherKeyType>
+			>::type
+		>::type
+		GetVal() const
+		{
+			return Internal::MemberGetterHelper<
+				FindValType<_OtherKeyType>,
+				_KeyType,
+				_ValType,
+				ConstMapError,
+				_OtherKeyType
+			>::Get(m_val, m_null);
+		}
+
+		_ValType m_val;
+		ConstMapError m_null;
 	};
 
 	template<typename _KeyType, typename _ValType, typename... _Pairs>
@@ -97,6 +208,41 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			std::true_type,
 			std::false_type
 		>::type;
+
+		template<typename _OtherKeyType>
+		typename std::add_lvalue_reference<
+			FindValType<_OtherKeyType>
+		>::type
+		GetVal()
+		{
+			return Internal::MemberGetterHelper<
+				FindValType<_OtherKeyType>,
+				_KeyType,
+				_ValType,
+				Next,
+				_OtherKeyType
+			>::Get(m_val, m_next);
+		}
+
+		template<typename _OtherKeyType>
+		typename std::add_lvalue_reference<
+			typename std::add_const<
+				FindValType<_OtherKeyType>
+			>::type
+		>::type
+		GetVal() const
+		{
+			return Internal::MemberGetterHelper<
+				FindValType<_OtherKeyType>,
+				_KeyType,
+				_ValType,
+				Next,
+				_OtherKeyType
+			>::Get(m_val, m_next);
+		}
+
+		_ValType m_val;
+		Next m_next;
 	};
 
 	// Build Const Map
