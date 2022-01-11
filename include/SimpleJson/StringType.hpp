@@ -3,8 +3,9 @@
 
 #include "Json.hpp"
 
+#include <SimpleUtf/Utf.hpp>
+
 #include "Internal/ParserHelpers.hpp"
-#include "Internal/Utf.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -96,7 +97,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 							throw ParseError("Unexpected character", oriPos, begin);
 						}
 					}
-					else if (Internal::IsAscii(ch)) // ASCII char
+					else if (Internal::Utf::IsAscii(ch)) // ASCII char
 					{
 						++begin;
 						resStr.push_back(ch);
@@ -105,11 +106,11 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					{
 						try
 						{
-							begin = Internal::UtfConvertOnce(Internal::Utf8ToCodePtOnce<InputIt>,
-								Internal::CodePtToUtf8Once<std::back_insert_iterator<StringCtnType> >,
+							begin = Internal::Utf::UtfConvertOnce(Internal::Utf::Utf8ToCodePtOnce<InputIt>,
+								Internal::Utf::CodePtToUtf8Once<std::back_insert_iterator<StringCtnType> >,
 								begin, end, std::back_inserter(resStr));
 						}
-						catch(const Internal::UtfConversionException& e)
+						catch(const Internal::Utf::UtfConversionException& e)
 						{
 							throw ParseError(std::string("Invalid Unicode - ") + e.what(), oriPos, begin);
 						}
@@ -212,9 +213,9 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 			try
 			{
-				Internal::Utf16ToUtf8(utf16.begin(), utf16.end(), dest);
+				Internal::Utf::Utf16ToUtf8(utf16.begin(), utf16.end(), dest);
 			}
-			catch(const Internal::UtfConversionException& e)
+			catch(const Internal::Utf::UtfConversionException& e)
 			{
 				throw ParseError(std::string("Invalid Unicode - ") + e.what(), oriPos, begin);
 			}
@@ -247,7 +248,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 			std::u16string tmpUtf6;
 
-			begin = Internal::Utf8ToUtf16Once(begin, end, std::back_inserter(tmpUtf6));
+			begin = Internal::Utf::Utf8ToUtf16Once(begin, end, std::back_inserter(tmpUtf6));
 
 			ToStringUXXXXEscapeHex(tmpUtf6.front(), dest);
 
@@ -552,7 +553,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 			for (auto it = m_data.begin(); it != m_data.end();)
 			{
-				if (Internal::IsPrintableAscii(*it) && (*it) != '\"' && (*it) != '\\' && (*it) != '/')
+				if (Internal::Utf::IsPrintableAscii(*it) && (*it) != '\"' && (*it) != '\\' && (*it) != '/')
 				// output directly
 				{
 					std::copy(it, it + 1, dest);

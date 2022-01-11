@@ -1,4 +1,4 @@
-# Copyright 2021 Haofan Zheng
+# Copyright 2022 Haofan Zheng
 # See accompanying file LICENSE
 
 cmake_minimum_required(VERSION 3.14)
@@ -21,5 +21,6 @@ add_library(SimpleJson INTERFACE)
 target_include_directories(SimpleJson INTERFACE include)
 
 if(${SIMPLEJSON_TEST})
+	enable_testing()
 	add_subdirectory(test)
 endif(${SIMPLEJSON_TEST})

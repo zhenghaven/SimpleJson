@@ -1,4 +1,4 @@
-# Copyright 2020 Haofan Zheng
+# Copyright 2022 Haofan Zheng
 # See accompanying file LICENSE
 
 cmake_minimum_required(VERSION 3.14)
@@ -31,8 +31,8 @@ add_compile_options(
 	"$<$<CONFIG:Release>:${RELEASE_OPTIONS}>"
 )
 
-set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_CXX_STANDARD 20)
+OPTION(SIMPLEJSON_TEST_CXX_STANDARD
+	"C++ standard version used to build SimpleJson test executable." 11)
 
 ################################################################################
 # Fetching dependencise
@@ -47,6 +47,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(git_googletest)
 
+FetchContent_Declare(
+  git_simpleutf
+  GIT_REPOSITORY https://github.com/zhenghaven/SimpleUtf.git
+  GIT_TAG        origin/main
+)
+FetchContent_MakeAvailable(git_simpleutf)
+
 ################################################################################
 # Adding testing executable
 ################################################################################
@@ -57,4 +64,10 @@ file(GLOB_RECURSE SOURCES ${SOURCES_DIR_PATH}/*.[ch]*)
 
 add_executable(SimpleJson_test ${SOURCES})
 
-target_link_libraries(SimpleJson_test SimpleJson gtest)
+target_link_libraries(SimpleJson_test SimpleJson SimpleUtf gtest)
+
+add_test(NAME SimpleJson_test
+	COMMAND SimpleJson_test)
+
+set_property(TARGET SimpleJson_test
+	PROPERTY CXX_STANDARD ${SIMPLEJSON_TEST_CXX_STANDARD})
