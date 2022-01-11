@@ -273,7 +273,11 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 #endif
 		emplace_back(_Args&&... args)
 		{
+#if __cplusplus > 201402L
 			return m_data.emplace_back(std::forward<_Args>(args)...);
+#else
+			m_data.emplace_back(std::forward<_Args>(args)...);
+#endif
 		}
 
 		template< class... _Args >

@@ -100,7 +100,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 					else if (Internal::Utf::IsAscii(ch)) // ASCII char
 					{
 						++begin;
-						resStr.push_back(ch);
+						resStr.push_back(static_cast<uint8_t>(ch));
 					}
 					else // Default - assuming UTF-8
 					{

@@ -363,11 +363,14 @@ GTEST_TEST(TestNumberParser, ConversionCorrect)
 {
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int8_t>("0", "", ""), 0);
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int8_t>("-0", "", ""), 0);
-	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int8_t>("-128", "", ""), -128);
+	constexpr int32_t expResultN8 = -128;
+	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int8_t>("-128", "", ""), expResultN8);
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int8_t>("127", "", ""), 127);
-	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int16_t>("-32768", "", ""), -32768);
+	constexpr int32_t expResultN16 = -32768;
+	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int16_t>("-32768", "", ""), expResultN16);
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int16_t>("32767", "", ""), 32767);
-	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int32_t>("-2147483648", "", ""), -2147483648);
+	constexpr int32_t expResultN32 = -2147483647 - 1;
+	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int32_t>("-2147483648", "", ""), expResultN32);
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int32_t>("2147483647", "", ""), 2147483647);
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int64_t>("-9223372036854775808", "", ""), std::numeric_limits<int64_t>::min());
 	EXPECT_EQ(Parser::Internal::ComponentsToNumber<int64_t>("9223372036854775807", "", ""), std::numeric_limits<int64_t>::max());
@@ -437,9 +440,9 @@ GTEST_TEST(TestNumberParser, ConversionOutOfRange)
 	EXPECT_THROW(Parser::Internal::ComponentsToNumber<uint32_t>("4294967296", "", ""), RangeErrorException);
 	EXPECT_THROW(Parser::Internal::ComponentsToNumber<uint32_t>("18446744073709551616", "", ""), RangeErrorException);
 
-	EXPECT_THROW(Parser::Internal::ComponentsToNumber<float>("12345", "6789", "35"), RangeErrorException);
-	EXPECT_THROW(Parser::Internal::ComponentsToNumber<float>("12345", "6789", "-43"), RangeErrorException);
+	EXPECT_THROW(Parser::Internal::ComponentsToNumber<float>("1", "2345", "1000"), RangeErrorException);
+	EXPECT_THROW(Parser::Internal::ComponentsToNumber<float>("1", "2345", "-1000"), RangeErrorException);
 
-	EXPECT_THROW(Parser::Internal::ComponentsToNumber<double>("12345", "6789", "305"), RangeErrorException);
-	EXPECT_THROW(Parser::Internal::ComponentsToNumber<double>("12345", "6789", "-315"), RangeErrorException);
+	EXPECT_THROW(Parser::Internal::ComponentsToNumber<double>("1", "2345", "100000"), RangeErrorException);
+	EXPECT_THROW(Parser::Internal::ComponentsToNumber<double>("1", "2345", "-100000"), RangeErrorException);
 }
