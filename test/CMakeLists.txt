@@ -3,7 +3,8 @@
 
 cmake_minimum_required(VERSION 3.14)
 
-project(SimpleJson_test VERSION 0.1 LANGUAGES CXX)
+#project(SimpleJson_test VERSION 0.1 LANGUAGES CXX)
+include(TestCoverage.cmake)
 
 ################################################################################
 # Set compile options
@@ -71,3 +72,7 @@ add_test(NAME SimpleJson_test
 
 set_property(TARGET SimpleJson_test
 	PROPERTY CXX_STANDARD ${SIMPLEJSON_TEST_CXX_STANDARD})
+
+if (SIMPLEJSON_TEST_LCOV)
+	setup_cxx_test_coverage(SimpleJson_test "${PROJECT_SOURCE_DIR}/include")
+endif()

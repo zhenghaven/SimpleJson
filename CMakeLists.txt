@@ -8,6 +8,7 @@ project(SimpleJson VERSION 0.0.1 LANGUAGES CXX)
 add_subdirectory(include)
 
 OPTION(SIMPLEJSON_TEST "Option to build SimpleJson test executable." OFF)
+OPTION(SIMPLEJSON_TEST_LCOV "Option to turn on test code coverage." OFF)
 # SET(SIMPLEJSON_TEST ON CACHE BOOL "Option to build SimpleJson test executable." FORCE)
 
 set(ENV{SIMPLEJSON_HOME} ${CMAKE_CURRENT_LIST_DIR})
