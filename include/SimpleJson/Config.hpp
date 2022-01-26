@@ -19,7 +19,6 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 	using DefaultRealType = double;
 
 	constexpr size_t gk_defaultRealPrecision = 17;
-	constexpr size_t gk_defaultPrintfBufSize = 36;
 
 	constexpr bool gk_defaultSortKeys = false;
 

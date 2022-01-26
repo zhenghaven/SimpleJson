@@ -39,6 +39,8 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		template<typename _rhs_StringCtnType>
 		friend StringImpl<_rhs_StringCtnType> operator+(const StringCtnType& lhs, const StringImpl<_rhs_StringCtnType>& rhs);
 
+		friend class std::hash<StringImpl<StringCtnType> >;
+
 		template<typename InputIt>
 		static std::pair<StringImpl, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
@@ -773,9 +775,30 @@ namespace std
 {
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 	template<typename _StringCtnType>
-	struct hash<SimpleJson::StringImpl<_StringCtnType> > : std::hash<_StringCtnType> {};
+	class hash<SimpleJson::StringImpl<_StringCtnType> > :
+		std::hash<_StringCtnType>
+	{
+	public:
+		using _ObjType = SimpleJson::StringImpl<_StringCtnType>;
 #else
 	template<typename _StringCtnType>
-	struct hash<SIMPLEJSON_CUSTOMIZED_NAMESPACE::StringImpl<_StringCtnType> > : std::hash<_StringCtnType> {};
+	struct hash<SIMPLEJSON_CUSTOMIZED_NAMESPACE::StringImpl<_StringCtnType> > :
+		std::hash<_StringCtnType>
+	{
+	public:
+		using _ObjType = SIMPLEJSON_CUSTOMIZED_NAMESPACE::StringImpl<_StringCtnType>;
 #endif
+	public:
+		using _Base = std::hash<_StringCtnType>;
+
+#if __cplusplus < 201703L
+		typedef typename _Base::result_type       result_type;
+		typedef typename _Base::argument_type     argument_type;
+#endif
+
+		size_t operator()(const _ObjType& cnt) const
+		{
+			return _Base::operator()(cnt.m_data);
+		}
+	};
 }
