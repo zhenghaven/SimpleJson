@@ -4,6 +4,8 @@
 
 #include "Number.hpp"
 
+#include "Internal/rj_dtoa.hpp"
+
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
 #else
@@ -106,35 +108,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		{
 			constexpr char cmaStr[] = ",";
 
-			std::string realStr(gk_defaultPrintfBufSize, '\0');
-
-			bool isWritten = false;
-			while (!isWritten)
-			{
-				auto neededSize = std::snprintf(
-					&realStr[0], realStr.size(),
-					"%.*g",
-					static_cast<int>(precision),
-					_Base::GetVal()
-				);
-				if (static_cast<size_t>(neededSize) >= realStr.size())
-				{
-					realStr.resize(neededSize + 1);
-				}
-				else
-				{
-					isWritten = true;
-					realStr.resize(neededSize);
-				}
-			}
-
-			if (realStr.find('.') == std::string::npos &&
-				realStr.find('e') == std::string::npos)
-			{
-				realStr += ".0";
-			}
-
-			std::copy(realStr.begin(), realStr.end(), dest);
+			Internal::dtoa(dest, _Base::GetVal(), precision);
 
 			if (addComma)
 			{

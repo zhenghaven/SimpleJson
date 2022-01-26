@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <cstring>
 
-#include <string>
 #include <tuple>
 #include <utility>
 
@@ -55,8 +54,9 @@ inline const char* GetDigitsLut() {
 	return cDigitsLut;
 }
 
+template<typename ContainerType>
 inline void GrisuRound(
-	std::string& buffer,
+	ContainerType& buffer,
 	uint64_t delta,
 	uint64_t rest,
 	uint64_t ten_kappa,
@@ -86,11 +86,12 @@ inline int CountDecimalDigit32(uint32_t n) {
 	return 9;
 }
 
+template<typename ContainerType>
 inline void DigitGen(
 	const DiyFp& W,
 	const DiyFp& Mp,
 	uint64_t delta,
-	std::string& buffer,
+	ContainerType& buffer,
 	int& K
 ) {
 	static const uint64_t kPow10[] = {
@@ -153,7 +154,8 @@ inline void DigitGen(
 
 }
 
-inline void Grisu2(std::string& buf, int& K, double value) {
+template<typename ContainerType>
+inline void Grisu2(ContainerType& buf, int& K, double value) {
 	const DiyFp v(value);
 	DiyFp w_m, w_p;
 	v.NormalizedBoundaries(&w_m, &w_p);
@@ -168,7 +170,8 @@ inline void Grisu2(std::string& buf, int& K, double value) {
 	DigitGen(W, Wp, Wp.f - Wm.f, buf, K);
 }
 
-inline void WriteExponent(std::string& buf, int K) {
+template<typename ContainerType>
+inline void WriteExponent(ContainerType& buf, int K) {
 	if (K < 0) {
 		buf.push_back('-');
 		K = -K;
@@ -190,7 +193,8 @@ inline void WriteExponent(std::string& buf, int K) {
 		buf.push_back(static_cast<char>('0' + static_cast<char>(K)));
 }
 
-inline void Prettify(std::string& buf, int k, size_t maxDecimal) {
+template<typename ContainerType>
+inline void Prettify(ContainerType& buf, int k, size_t maxDecimal) {
 	static constexpr size_t maxSigWidth = 21;
 
 	int signAdjust = (buf.size() > 0 && buf[0] == '-') ? -1 : 0;
@@ -257,11 +261,11 @@ inline void Prettify(std::string& buf, int k, size_t maxDecimal) {
 			return;
 		}
 	}
-	else if (kk < -maxDecimalPlaces) {
-		// Truncate to zero
-		buf = (buf.size() > 0 && buf[0] == '-') ? "-0.0" : "0.0";
-		return;
-	}
+	// else if (kk < -maxDecimalPlaces) {
+	// 	// Truncate to zero
+	// 	buf = (buf.size() > 0 && buf[0] == '-') ? "-0.0" : "0.0";
+	// 	return;
+	// }
 	else if (buf.size() + signAdjust == 1) {
 		// 1e30
 		buf.push_back('e');
@@ -279,12 +283,15 @@ inline void Prettify(std::string& buf, int k, size_t maxDecimal) {
 /**
  * @brief Converts a double value into a string, using Grisu2 algorithm
  *
+ * @tparam ContainerType The type of container
+ *
  * @param value The double value needs to be converted
  * @param maxDecimalPlaces The maximum number of decimal digits;
  *                         A input of 0 should have the same effect as 1.
- * @return std::string The resulting string.
+ * @return ContainerType The resulting string.
  */
-inline std::string dtoa(double value, size_t maxDecimalPlaces = 324) {
+template<typename ContainerType>
+inline ContainerType dtoa(double value, size_t maxDecimalPlaces = 324) {
 	Double d(value);
 
 	if (d.IsZero()) {
@@ -295,7 +302,7 @@ inline std::string dtoa(double value, size_t maxDecimalPlaces = 324) {
 		}
 	}
 	else {
-		std::string res;
+		ContainerType res;
 		int K = 0;
 
 		if (value < 0) {
@@ -308,6 +315,25 @@ inline std::string dtoa(double value, size_t maxDecimalPlaces = 324) {
 
 		return res;
 	}
+}
+
+/**
+ * @brief Converts a double value into a string and copy into a
+ *        back_insert_iterator, using Grisu2 algorithm
+ *
+ * @tparam BackInserterType The type of back_insert_iterator
+ *
+ * @param it The back_insert_iterator
+ * @param value The double value needs to be converted
+ * @param maxDecimalPlaces The maximum number of decimal digits;
+ *                         A input of 0 should have the same effect as 1.
+ */
+template<typename BackInserterType>
+inline void dtoa(BackInserterType it, double value, size_t maxDecimalPlaces = 324) {
+	using ContainerType = typename BackInserterType::container_type;
+
+	ContainerType str = dtoa<ContainerType>(value, maxDecimalPlaces);
+	std::copy(str.begin(), str.end(), it);
 }
 
 } // namespace Internal

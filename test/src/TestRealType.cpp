@@ -344,7 +344,7 @@ GTEST_TEST(TestRealType, ToString)
 			obj2 = Json::Parse(testInput.begin(), testInput.end())
 		));
 		EXPECT_EQ(obj2->GetDataType(), DataTypes::Real);
-		EXPECT_NEAR(obj1->GetReal(), obj2->GetReal(), 0.001);
+		EXPECT_NEAR(obj1->GetReal(), obj2->GetReal(), 1.0e-15);
 	}
 	{
 		std::string testInput = "1.2093e100\t\t";
@@ -362,7 +362,7 @@ GTEST_TEST(TestRealType, ToString)
 			obj2 = Json::Parse(testInput.begin(), testInput.end())
 		));
 		EXPECT_EQ(obj2->GetDataType(), DataTypes::Real);
-		EXPECT_NEAR(obj1->GetReal(), obj2->GetReal(), 0.1e100);
+		EXPECT_NEAR(obj1->GetReal(), obj2->GetReal(), 1.0e85);
 	}
 	{
 		std::string testInput = "-1.2093e-100\t\t";
@@ -380,7 +380,7 @@ GTEST_TEST(TestRealType, ToString)
 			obj2 = Json::Parse(testInput.begin(), testInput.end())
 		));
 		EXPECT_EQ(obj2->GetDataType(), DataTypes::Real);
-		EXPECT_NEAR(obj1->GetReal(), obj2->GetReal(), 0.1e-100);
+		EXPECT_NEAR(obj1->GetReal(), obj2->GetReal(), 1.0e-99);
 	}
 	{
 		std::unique_ptr<Json> obj1 = MakeUniquePtr::make_unique<RealType>(1);
