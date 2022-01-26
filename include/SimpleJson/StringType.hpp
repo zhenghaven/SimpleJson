@@ -14,7 +14,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 #endif
 {
 	template<typename _StringCtnType = std::string>
-	class String
+	class StringImpl
 	{
 	public: // Static member:
 
@@ -37,10 +37,10 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		static const size_type npos = StringCtnType::npos;
 
 		template<typename _rhs_StringCtnType>
-		friend String<_rhs_StringCtnType> operator+(const StringCtnType& lhs, const String<_rhs_StringCtnType>& rhs);
+		friend StringImpl<_rhs_StringCtnType> operator+(const StringCtnType& lhs, const StringImpl<_rhs_StringCtnType>& rhs);
 
 		template<typename InputIt>
-		static std::pair<String, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
+		static std::pair<StringImpl, InputIt> ParsePartial(InputIt begin, InputIt end, const InputIt oriPos)
 		{
 			StringCtnType resStr;
 
@@ -128,7 +128,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		}
 
 		template<typename InputIt>
-		static String Parse(InputIt begin, InputIt end)
+		static StringImpl Parse(InputIt begin, InputIt end)
 		{
 			auto partialRes = ParsePartial(begin, end, begin);
 
@@ -262,43 +262,43 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		}
 
 	public:
-		String() :
+		StringImpl() :
 			m_data()
 		{}
 
-		String(const_pointer other) :
+		StringImpl(const_pointer other) :
 			m_data(other)
 		{}
 
-		String(const StringCtnType& other) :
+		StringImpl(const StringCtnType& other) :
 			m_data(other)
 		{}
 
-		String(StringCtnType&& other) :
+		StringImpl(StringCtnType&& other) :
 			m_data(std::forward<StringCtnType>(other))
 		{}
 
 		// Deep Copy
-		// String(const String& other) :
+		// StringImpl(const StringImpl& other) :
 		// 	m_data(other.m_data)
 		// {}
 
-		String(String&& other) :
+		StringImpl(StringImpl&& other) :
 			m_data(std::move(other.m_data))
 		{}
 
-		virtual ~String()
+		virtual ~StringImpl()
 		{}
 
 		// Deep Copy
-		// String& operator=(const String& rhs)
+		// StringImpl& operator=(const StringImpl& rhs)
 		// {
 		// 	m_data = rhs.m_data;
 
 		// 	return *this;
 		// }
 
-		String& operator=(String&& rhs)
+		StringImpl& operator=(StringImpl&& rhs)
 		{
 			if (this != &rhs)
 			{
@@ -308,24 +308,24 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			return *this;
 		}
 
-		bool operator==(const String& rhs) const { return m_data == rhs.m_data; }
-		bool operator!=(const String& rhs) const { return m_data != rhs.m_data; }
-		bool operator<=(const String& rhs) const { return m_data <= rhs.m_data; }
-		bool operator>=(const String& rhs) const { return m_data >= rhs.m_data; }
-		bool operator<(const String& rhs) const { return m_data < rhs.m_data; }
-		bool operator>(const String& rhs) const { return m_data > rhs.m_data; }
+		bool operator==(const StringImpl& rhs) const { return m_data == rhs.m_data; }
+		bool operator!=(const StringImpl& rhs) const { return m_data != rhs.m_data; }
+		bool operator<=(const StringImpl& rhs) const { return m_data <= rhs.m_data; }
+		bool operator>=(const StringImpl& rhs) const { return m_data >= rhs.m_data; }
+		bool operator<(const StringImpl& rhs) const { return m_data < rhs.m_data; }
+		bool operator>(const StringImpl& rhs) const { return m_data > rhs.m_data; }
 
-		String operator+(const String& str) { return String(m_data + str.m_data); }
+		StringImpl operator+(const StringImpl& str) { return StringImpl(m_data + str.m_data); }
 
-		String& operator+=(const String& str) { m_data += str.m_data; return *this; }
+		StringImpl& operator+=(const StringImpl& str) { m_data += str.m_data; return *this; }
 
-		void swap(String& other) { return m_data.swap(other.m_data); }
+		void swap(StringImpl& other) { return m_data.swap(other.m_data); }
 
-		String& insert(size_type index, const String& str) { return m_data.insert(index, str.m_data); }
-		String& insert(size_type index, const String& str,
+		StringImpl& insert(size_type index, const StringImpl& str) { return m_data.insert(index, str.m_data); }
+		StringImpl& insert(size_type index, const StringImpl& str,
 			size_type index_str, size_type count = StringCtnType::npos) { return m_data.insert(index, str.m_data, index_str, count); }
-		String& append(const String& str) { m_data.append(str.m_data); return *this; }
-		String& append(const String& str,
+		StringImpl& append(const StringImpl& str) { m_data.append(str.m_data); return *this; }
+		StringImpl& append(const StringImpl& str,
 			size_type pos, size_type count = StringCtnType::npos) { m_data.append(str.data, pos, count); return *this; }
 
 		int compare(const StringCtnType& str) const noexcept { return m_data.compare(str); }
@@ -334,13 +334,13 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		int compare(size_type pos1, size_type count1, const StringCtnType& str,
 			size_type pos2, size_type count2 = npos) const { return m_data.compare(pos1, count1, str, pos2, count2); }
 
-		String& operator=(const StringCtnType& rhs)
+		StringImpl& operator=(const StringCtnType& rhs)
 		{
 			m_data = rhs;
 			return *this;
 		}
 
-		String& operator=(StringCtnType&& rhs)
+		StringImpl& operator=(StringCtnType&& rhs)
 		{
 			m_data = std::move(rhs);
 			return *this;
@@ -353,12 +353,12 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		bool operator<(const StringCtnType& rhs) const { return m_data < rhs; }
 		bool operator>(const StringCtnType& rhs) const { return m_data > rhs; }
 
-		String operator+(const StringCtnType& str) { return String(m_data + str); }
+		StringImpl operator+(const StringCtnType& str) { return StringImpl(m_data + str); }
 
-		String& operator+=(const StringCtnType& str) { m_data += str; return *this; }
-		String& operator+=(value_type ch) { m_data += ch; return *this; }
-		String& operator+=(const_pointer s) { m_data += s; return *this; }
-		String& operator+=(std::initializer_list<value_type> ilist) { m_data += ilist; return *this; }
+		StringImpl& operator+=(const StringCtnType& str) { m_data += str; return *this; }
+		StringImpl& operator+=(value_type ch) { m_data += ch; return *this; }
+		StringImpl& operator+=(const_pointer s) { m_data += s; return *this; }
+		StringImpl& operator+=(std::initializer_list<value_type> ilist) { m_data += ilist; return *this; }
 
 		reference at(size_type pos) { return m_data.at(pos); }
 		const_reference at(size_type pos) const { return m_data.at(pos); }
@@ -402,17 +402,17 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		void clear() noexcept { return m_data.clear(); }
 
-		String substr(size_type pos = 0, size_type count = npos) const { return String(m_data.substr(pos, count)); }
+		StringImpl substr(size_type pos = 0, size_type count = npos) const { return StringImpl(m_data.substr(pos, count)); }
 
 		size_type copy(pointer dest, size_type count, size_type pos = 0) const { return m_data.copy(dest, count, pos); }
 
 		void swap(StringCtnType& other) { return m_data.swap(other); }
 
-		String& insert(size_type index, size_type count, value_type ch) { m_data.insert(index, count, ch); return *this; }
-		String& insert(size_type index, const_pointer s) { m_data.insert(index, s); return *this; }
-		String& insert(size_type index, const_pointer s, size_type count) { m_data.insert(index, s, count); return *this; }
-		String& insert(size_type index, const StringCtnType& str) { m_data.insert(index, str); return *this; }
-		String& insert(size_type index, const StringCtnType& str,
+		StringImpl& insert(size_type index, size_type count, value_type ch) { m_data.insert(index, count, ch); return *this; }
+		StringImpl& insert(size_type index, const_pointer s) { m_data.insert(index, s); return *this; }
+		StringImpl& insert(size_type index, const_pointer s, size_type count) { m_data.insert(index, s, count); return *this; }
+		StringImpl& insert(size_type index, const StringCtnType& str) { m_data.insert(index, str); return *this; }
+		StringImpl& insert(size_type index, const StringCtnType& str,
 			size_type index_str, size_type count = npos) { m_data.insert(index, str, index_str, count); return *this; }
 		iterator insert(const_iterator pos, value_type ch) { return m_data.insert(pos, ch); }
 		iterator insert(const_iterator pos, size_type count, value_type ch) { return m_data.insert(pos, count, ch); }
@@ -420,66 +420,66 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 		iterator insert(const_iterator pos, InputIt first, InputIt last) { return m_data.insert(pos, first, last); }
 		iterator insert(const_iterator pos, std::initializer_list<value_type> ilist) { return m_data.insert(pos, ilist); }
 
-		String& append(size_type count, value_type ch) { m_data.append(count, ch); return *this; }
-		String& append(const StringCtnType& str) { m_data.append(str); return *this; }
-		String& append(const StringCtnType& str,
+		StringImpl& append(size_type count, value_type ch) { m_data.append(count, ch); return *this; }
+		StringImpl& append(const StringCtnType& str) { m_data.append(str); return *this; }
+		StringImpl& append(const StringCtnType& str,
 			size_type pos, size_type count = npos) { m_data.append(str, pos, count); return *this; }
-		String& append(const_pointer s, size_type count) { m_data.append(s, count); return *this; }
-		String& append(const_pointer s) { m_data.append(s); return *this; }
+		StringImpl& append(const_pointer s, size_type count) { m_data.append(s, count); return *this; }
+		StringImpl& append(const_pointer s) { m_data.append(s); return *this; }
 		template<class InputIt>
-		String& append(InputIt first, InputIt last) { m_data.append(first, last); return *this; }
-		String& append(std::initializer_list<value_type> ilist) { m_data.append(ilist); return *this; }
+		StringImpl& append(InputIt first, InputIt last) { m_data.append(first, last); return *this; }
+		StringImpl& append(std::initializer_list<value_type> ilist) { m_data.append(ilist); return *this; }
 
-		int compare(const String& str) const noexcept { return m_data.compare(str.m_data); }
+		int compare(const StringImpl& str) const noexcept { return m_data.compare(str.m_data); }
 		int compare(size_type pos1, size_type count1,
-			const String& str) const { return m_data.compare(pos1, count1, str.m_data); }
-		int compare(size_type pos1, size_type count1, const String& str,
+			const StringImpl& str) const { return m_data.compare(pos1, count1, str.m_data); }
+		int compare(size_type pos1, size_type count1, const StringImpl& str,
 			size_type pos2, size_type count2 = npos) const { return m_data.compare(pos1, count1, str.m_data, pos2, count2); }
 		int compare(const_pointer s) const { return m_data.compare(s); }
 		int compare(size_type pos1, size_type count1, const_pointer s) const { return m_data.compare(pos1, count1, s); }
 		int compare(size_type pos1, size_type count1, const_pointer s,
 			size_type count2) const { return m_data.compare(pos1, count1, s, count2); }
 
-		String& replace(size_type pos, size_type count,
+		StringImpl& replace(size_type pos, size_type count,
 			const StringCtnType& str) { m_data.replace(pos, count, str); return *this; }
-		String& replace(const_iterator first, const_iterator last,
+		StringImpl& replace(const_iterator first, const_iterator last,
 			const StringCtnType& str) { m_data.replace(first, last, str); return *this; }
-		String& replace(size_type pos, size_type count, const StringCtnType& str,
+		StringImpl& replace(size_type pos, size_type count, const StringCtnType& str,
 			size_type pos2, size_type count2 = npos) { m_data.replace(pos, count, str, pos2, count2); return *this; }
 
-		String& replace(size_type pos, size_type count,
-			const String& str) { m_data.replace(pos, count, str.m_data); return *this; }
-		String& replace(const_iterator first, const_iterator last,
-			const String& str) { m_data.replace(first, last, str.m_data); return *this; }
-		String& replace(size_type pos, size_type count, const String& str,
+		StringImpl& replace(size_type pos, size_type count,
+			const StringImpl& str) { m_data.replace(pos, count, str.m_data); return *this; }
+		StringImpl& replace(const_iterator first, const_iterator last,
+			const StringImpl& str) { m_data.replace(first, last, str.m_data); return *this; }
+		StringImpl& replace(size_type pos, size_type count, const StringImpl& str,
 			size_type pos2, size_type count2 = npos) { m_data.replace(pos, count, str.m_data, pos2, count2); return *this; }
 		template<class InputIt>
-		String& replace(const_iterator first, const_iterator last,
+		StringImpl& replace(const_iterator first, const_iterator last,
 			InputIt first2, InputIt last2){ m_data.replace(first, last, first2, last2); return *this; }
-		String& replace(size_type pos, size_type count,
+		StringImpl& replace(size_type pos, size_type count,
 			const_pointer cstr, size_type count2) { m_data.replace(pos, count, cstr, count2); return *this; }
-		String& replace(const_iterator first, const_iterator last,
+		StringImpl& replace(const_iterator first, const_iterator last,
 			const_pointer cstr, size_type count2) { m_data.replace(first, last, cstr, count2); return *this; }
-		String& replace(size_type pos, size_type count,
+		StringImpl& replace(size_type pos, size_type count,
 			const_pointer cstr) { m_data.replace(pos, count, cstr); return *this; }
-		String& replace(const_iterator first, const_iterator last,
+		StringImpl& replace(const_iterator first, const_iterator last,
 			const_pointer cstr) { m_data.replace(first, last, cstr); return *this; }
-		String& replace(size_type pos, size_type count,
+		StringImpl& replace(size_type pos, size_type count,
 			size_type count2, value_type ch) { m_data.replace(pos, count, count2, ch); return *this; }
-		String& replace(const_iterator first, const_iterator last,
+		StringImpl& replace(const_iterator first, const_iterator last,
 			size_type count2, value_type ch) { m_data.replace(first, last, count2, ch); return *this; }
-		String& replace(const_iterator first, const_iterator last,
+		StringImpl& replace(const_iterator first, const_iterator last,
 			std::initializer_list<value_type> ilist) { m_data.replace(first, last, ilist); return *this; }
 
 		size_type find(const StringCtnType& str, size_type pos = 0) const noexcept { return m_data.find(str, pos); }
-		size_type find(const String& str, size_type pos = 0) const noexcept { return m_data.find(str.m_data, pos); }
+		size_type find(const StringImpl& str, size_type pos = 0) const noexcept { return m_data.find(str.m_data, pos); }
 		size_type find(const_pointer s, size_type pos, size_type count) const { return m_data.find(s, pos, count); }
 		size_type find(const_pointer s, size_type pos = 0) const  { return m_data.find(s, pos); }
 		size_type find(value_type ch, size_type pos = 0) const noexcept { return m_data.find(ch, pos); }
 
 		size_type rfind(const StringCtnType& str,
 			size_type pos = npos) const noexcept { return m_data.rfind(str, pos); }
-		size_type rfind(const String& str,
+		size_type rfind(const StringImpl& str,
 			size_type pos = npos) const noexcept { return m_data.rfind(str.m_data, pos); }
 		size_type rfind(const_pointer s, size_type pos, size_type count) const { return m_data.rfind(s, pos, count); }
 		size_type rfind(const_pointer s, size_type pos = npos) const { return m_data.rfind(s, pos); }
@@ -487,7 +487,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		size_type find_first_of(const StringCtnType& str,
 			size_type pos = 0) const noexcept { return m_data.find_first_of(str, pos); }
-		size_type find_first_of(const String& str,
+		size_type find_first_of(const StringImpl& str,
 			size_type pos = 0) const noexcept { return m_data.find_first_of(str.m_data, pos); }
 		size_type find_first_of(const_pointer s, size_type pos, size_type count) const { return m_data.find_first_of(s, pos, count); }
 		size_type find_first_of(const_pointer s, size_type pos = 0) const { return m_data.find_first_of(s, pos); }
@@ -495,7 +495,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		size_type find_first_not_of(const StringCtnType& str,
 			size_type pos = 0) const noexcept { return m_data.find_first_not_of(str, pos); }
-		size_type find_first_not_of(const String& str,
+		size_type find_first_not_of(const StringImpl& str,
 			size_type pos = 0) const noexcept { return m_data.find_first_not_of(str.m_data, pos); }
 		size_type find_first_not_of(const_pointer s,
 			size_type pos, size_type count) const { return m_data.find_first_not_of(s, pos, count); }
@@ -505,7 +505,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		size_type find_last_of(const StringCtnType& str,
 			size_type pos = npos) const { return m_data.find_last_of(str, pos); }
-		size_type find_last_of(const String& str,
+		size_type find_last_of(const StringImpl& str,
 			size_type pos = npos) const { return m_data.find_last_of(str.m_data, pos); }
 		size_type find_last_of(const_pointer s,
 			size_type pos, size_type count) const { return m_data.find_last_of(s, pos, count); }
@@ -514,7 +514,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 		size_type find_last_not_of(const StringCtnType& str,
 			size_type pos = npos) const noexcept { return m_data.find_last_not_of(str, pos); }
-		size_type find_last_not_of(const String& str,
+		size_type find_last_not_of(const StringImpl& str,
 			size_type pos = npos) const noexcept { return m_data.find_last_not_of(str.m_data, pos); }
 		size_type find_last_not_of(const_pointer s,
 			size_type pos, size_type count) const { return m_data.find_last_not_of(s, pos, count); }
@@ -621,61 +621,63 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 
 	private:
 		StringCtnType m_data;
-	};
+	}; // class StringImpl
+
+	using String = StringImpl<>;
 
 	template<typename _StringCtnType>
-	inline bool operator==(const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return rhs == lhs; }
+	inline bool operator==(const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return rhs == lhs; }
 	template<typename _StringCtnType>
-	inline bool operator!=(const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return rhs != lhs; }
+	inline bool operator!=(const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return rhs != lhs; }
 	template<typename _StringCtnType>
-	inline bool operator<=(const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return rhs >= lhs; }
+	inline bool operator<=(const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return rhs >= lhs; }
 	template<typename _StringCtnType>
-	inline bool operator>=(const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return rhs <= lhs; }
+	inline bool operator>=(const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return rhs <= lhs; }
 	template<typename _StringCtnType>
-	inline bool operator< (const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return rhs >  lhs; }
+	inline bool operator< (const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return rhs >  lhs; }
 	template<typename _StringCtnType>
-	inline bool operator> (const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return rhs <  lhs; }
+	inline bool operator> (const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return rhs <  lhs; }
 
 	template<typename _StringCtnType>
-	inline String<_StringCtnType> operator+(const _StringCtnType& lhs, const String<_StringCtnType>& rhs) { return String<_StringCtnType>(lhs + rhs.m_data); }
+	inline StringImpl<_StringCtnType> operator+(const _StringCtnType& lhs, const StringImpl<_StringCtnType>& rhs) { return StringImpl<_StringCtnType>(lhs + rhs.m_data); }
 
-	class StringType : public Json, public String<>
+	class StringType : public Json, public StringImpl<>
 	{
 	public: // Static members:
 
-		using _TypeBase = String<>;
+		using _TypeBase = StringImpl<>;
 
 	public:
 		StringType() :
 			Json::Json(),
-			_TypeBase::String()
+			_TypeBase::StringImpl()
 		{}
 
 		StringType(const char* val) :
 			Json::Json(),
-			_TypeBase::String(val)
+			_TypeBase::StringImpl(val)
 		{}
 
 		// Deep copy
 		// StringType(const _TypeBase& val) :
 		// 	Json::Json(),
-		// 	_TypeBase::String(val)
+		// 	_TypeBase::StringImpl(val)
 		// {}
 
 		StringType(_TypeBase&& val) :
 			Json::Json(),
-			_TypeBase::String(std::move(val))
+			_TypeBase::StringImpl(std::move(val))
 		{}
 
 		// Deep copy
 		// StringType(const StringType& other) :
 		// 	Json::Json(other),
-		// 	_TypeBase::String(other)
+		// 	_TypeBase::StringImpl(other)
 		// {}
 
 		StringType(StringType&& other) :
 			Json::Json(std::forward<Json>(other)),
-			_TypeBase::String(std::forward<_TypeBase>(other))
+			_TypeBase::StringImpl(std::forward<_TypeBase>(other))
 		{}
 
 		virtual ~StringType()
@@ -771,9 +773,9 @@ namespace std
 {
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 	template<typename _StringCtnType>
-	struct hash<SimpleJson::String<_StringCtnType> > : std::hash<_StringCtnType> {};
+	struct hash<SimpleJson::StringImpl<_StringCtnType> > : std::hash<_StringCtnType> {};
 #else
 	template<typename _StringCtnType>
-	struct hash<SIMPLEJSON_CUSTOMIZED_NAMESPACE::String<_StringCtnType> > : std::hash<_StringCtnType> {};
+	struct hash<SIMPLEJSON_CUSTOMIZED_NAMESPACE::StringImpl<_StringCtnType> > : std::hash<_StringCtnType> {};
 #endif
 }

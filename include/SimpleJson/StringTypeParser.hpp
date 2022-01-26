@@ -28,7 +28,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				InputIt begin, InputIt end, const InputIt oriPos
 			) const override
 			{
-				auto parseRes = String<>::ParsePartial(begin, end, oriPos);
+				auto parseRes = String::ParsePartial(begin, end, oriPos);
 
 				return std::make_pair(
 					MakeUniquePtr::make_unique<StringType>(std::move(parseRes.first)),
@@ -40,7 +40,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 				InputIt begin, InputIt end
 			) const override
 			{
-				return MakeUniquePtr::make_unique<StringType>(String<>::Parse(begin, end));
+				return MakeUniquePtr::make_unique<StringType>(String::Parse(begin, end));
 			}
 		};
 	}
