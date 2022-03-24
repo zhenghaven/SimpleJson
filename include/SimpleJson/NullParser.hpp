@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include "InputStateMachine.hpp"
-#include "SimpleObjects.hpp"
+#include "ParserBase.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -16,7 +15,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 {
 
 /**
- * @brief Basic implementation of Parsers
+ * @brief Parser for Null type object
  *
  * @tparam _ContainerType Type of containers which *may* be needed during
  *                        intermediate steps.
@@ -28,55 +27,46 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
  */
 template<
 	typename _ContainerType,
-	typename _RetType>
-class ParserBase
+	typename _ObjType,
+	typename _RetType = _ObjType>
+class NullParserImpl : public ParserBase<_ContainerType, _RetType>
 {
 public: // static members:
 
+	using Base = ParserBase<_ContainerType, _RetType>;
+	using Self = NullParserImpl<_ContainerType, _ObjType, _RetType>;
+
 	using ContainerType = _ContainerType;
 	using InputChType   = typename ContainerType::value_type;
+	using ObjType       = _ObjType;
 	using RetType       = _RetType;
 	using IteratorType  = Internal::Obj::FrIterator<InputChType, true>;
 	using ISMType       = ForwardIteratorStateMachine<IteratorType>;
 
 public:
 
-	ParserBase() = default;
+	NullParserImpl() = default;
 
 	// LCOV_EXCL_START
-	virtual ~ParserBase() = default;
+	virtual ~NullParserImpl() = default;
 	// LCOV_EXCL_STOP
 
-	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const = 0;
+	using Base::Parse;
 
-	virtual RetType Parse(const ContainerType& ctn) const
+	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const override
 	{
-		ISMType ism(
-			Internal::Obj::ToFrIt<true>(ctn.cbegin()),
-			Internal::Obj::ToFrIt<true>(ctn.cend()));
-
-		return Parse(ism);
-	}
-
-	virtual RetType ParseTillEnd(const ContainerType& ctn) const
-	{
-		ISMType ism(
-			Internal::Obj::ToFrIt<true>(ctn.cbegin()),
-			Internal::Obj::ToFrIt<true>(ctn.cend()));
-
-		auto res = Parse(ism);
-
-		ism.SkipWhiteSpace();
-
-		if (!ism.IsEnd())
+		if (ism.SkipSpaceAndGetCharAndAdv() == 'n' &&
+			ism.GetCharAndAdv()             == 'u' &&
+			ism.GetCharAndAdv()             == 'l' &&
+			ism.GetCharAndAdv()             == 'l')
 		{
-			throw ParseError("Extra Data",
-				ism.GetLineCount(), ism.GetColCount());
+			return ObjType();
 		}
 
-		return res;
+		throw ParseError("Unexpected character",
+			ism.GetLineCount(), ism.GetColCount());
 	}
 
-}; // class ParserBase
+}; // class NullParserImpl
 
 } // namespace SimpleJson

@@ -1,3 +1,8 @@
+# Copyright (c) 2022 Haofan Zheng
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+
 option(SIMPLEJSON_INSTALL_HEADERS "Install SimpleJson headers." ON)
 
 if(SIMPLEJSON_INSTALL_HEADERS)
@@ -8,6 +13,6 @@ if(SIMPLEJSON_INSTALL_HEADERS)
 		DESTINATION include/SimpleJson
 		PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
-	#add_subdirectory(SimpleJson)
+	add_subdirectory(SimpleJson)
 
 endif(SIMPLEJSON_INSTALL_HEADERS)

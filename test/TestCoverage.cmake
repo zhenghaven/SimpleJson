@@ -1,3 +1,9 @@
+# Copyright 2022 Haofan Zheng
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+
+
 
 ################################################################################
 # Test Coverage
@@ -12,9 +18,9 @@ macro(setup_cxx_test_coverage TARGET_NAME BASE_DIR)
 				"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir/src/")
 
 		set(${TARGET_NAME}_EXECUTABLE
-			"${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}")
+				"${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}")
 		set(${TARGET_NAME}_LCOV_OUTPUT_DIR
-				"${TARGET_NAME}.lcov/")
+				"${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.lcov/")
 		file(MAKE_DIRECTORY ${${TARGET_NAME}_LCOV_OUTPUT_DIR})
 		set(${TARGET_NAME}_LCOV_OUTPUT_ZIP
 				"${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.lcov.zip")
@@ -66,10 +72,10 @@ macro(setup_cxx_test_coverage TARGET_NAME BASE_DIR)
 			COMMAND ${LCOV_BIN} --gcov-tool ${GCOV_BIN}
 				--extract ${TARGET_NAME}.lcov.count "\"${BASE_DIR}/*\""
 				--output-file ${TARGET_NAME}.lcov.extract
-			COMMAND ${GENHTML_BIN} --quiet
+			COMMAND ${GENHTML_BIN} --quiet --demangle-cpp
 				--output-directory ${${TARGET_NAME}_LCOV_OUTPUT_DIR}
 				${TARGET_NAME}.lcov.extract
-			COMMAND ${ZIP_BIN} --recurse-paths --move --quiet
+			COMMAND ${ZIP_BIN} --recurse-paths --quiet #--move
 				${${TARGET_NAME}_LCOV_OUTPUT_ZIP}
 				${${TARGET_NAME}_LCOV_OUTPUT_DIR}
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
