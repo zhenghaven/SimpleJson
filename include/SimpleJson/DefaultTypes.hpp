@@ -62,6 +62,6 @@ using GenericObjectParser = GenericObjectParserImpl<
 	Internal::Obj::HashableObject,
 	Internal::Obj::ListT,
 	Internal::Obj::DictT,
-	Internal::Obj::Double>;
+	Internal::Obj::Object>;
 
 } // namespace SimpleJson
