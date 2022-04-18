@@ -6,7 +6,7 @@
 #pragma once
 
 #include "InputStateMachine.hpp"
-#include "SimpleObjects.hpp"
+#include "Internal/SimpleObjects.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson

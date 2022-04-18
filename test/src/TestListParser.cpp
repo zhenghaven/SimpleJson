@@ -21,6 +21,7 @@ namespace SimpleJson_Test
 GTEST_TEST(TestListParser, CountTestFile)
 {
 	static auto tmp = ++SimpleJson_Test::g_numOfTestFile;
+	(void)tmp;
 }
 
 GTEST_TEST(TestListParser, Construction)

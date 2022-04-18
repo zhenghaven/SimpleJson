@@ -6,7 +6,7 @@
 #pragma once
 
 #include "ParserBase.hpp"
-#include "SimpleUtf.hpp"
+#include "Internal/SimpleUtf.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -44,6 +44,8 @@ public: // static members:
 	using IteratorType  = Internal::Obj::FrIterator<InputChType, true>;
 	using ISMType       = ForwardIteratorStateMachine<IteratorType>;
 
+	using AsciiTraitType = Internal::Utf::AsciiTraits<InputChType>;
+
 public:
 
 	StringParserImpl() = default;
@@ -76,7 +78,7 @@ public:
 					ParseEscapeSomething(ism, res);
 				}
 				// Case 3 - normal ASCII character
-				else if (Internal::Utf::IsAscii(ch))
+				else if (AsciiTraitType::IsAsciiFast(ch))
 				{
 					res.push_back(ch);
 				}
@@ -95,6 +97,7 @@ public:
 							tmp.push_back(ism.GetCharAndAdv());
 						}
 
+						// UTF-8 => UTF-8 to validate encoding
 						Internal::Utf::UtfConvertOnce(
 							Internal::Utf::Utf8ToCodePtOnce<typename ContainerType::const_iterator>,
 							Internal::Utf::CodePtToUtf8Once<std::back_insert_iterator<ObjType> >,
@@ -117,9 +120,9 @@ public:
 
 private:
 
-	uint16_t ParseUXXXX(InputStateMachineIf<InputChType>& ism) const
+	char16_t ParseUXXXX(InputStateMachineIf<InputChType>& ism) const
 	{
-		uint16_t res = 0;
+		char16_t res = 0;
 		for (size_t i = 0; i < 4; ++i)
 		{
 			res <<= 4;
@@ -167,7 +170,7 @@ private:
 		return res;
 	}
 
-	uint16_t ParseEscapeUXXXX(InputStateMachineIf<InputChType>& ism) const
+	char16_t ParseEscapeUXXXX(InputStateMachineIf<InputChType>& ism) const
 	{
 		if (ism.GetCharAndAdv() == '\\' &&
 			ism.GetCharAndAdv() == 'u')
@@ -212,7 +215,7 @@ private:
 		// \uXXXX escape case
 		case 'u':
 			{
-				uint16_t pair[2] = { 0 };
+				char16_t pair[2] = { 0 };
 				bool isPair = false;
 
 				pair[0] = ParseUXXXX(ism);

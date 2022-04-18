@@ -16,6 +16,13 @@
 
 #include "GenericObjectParser.hpp"
 
+#include "NullWriter.hpp"
+#include "NumericWriter.hpp"
+#include "StringWriter.hpp"
+#include "ListWriter.hpp"
+#include "DictWriter.hpp"
+#include "ObjectWriter.hpp"
+
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
 #else
@@ -63,5 +70,38 @@ using GenericObjectParser = GenericObjectParserImpl<
 	Internal::Obj::ListT,
 	Internal::Obj::DictT,
 	Internal::Obj::Object>;
+
+// ===================== Writers =====================
+
+using JsonWriterNull = JsonWriterNullImpl<std::string>;
+
+using JsonWriterNumeric = JsonWriterNumericImpl<std::string>;
+
+using JsonWriterString = JsonWriterStringImpl<char, std::string, std::string>;
+
+template<typename _ValWriter>
+using JsonWriterListT =
+	JsonWriterListImpl<_ValWriter, std::string, std::string>;
+
+template<typename _KeyWriter, typename _ValWriter>
+using JsonWriterDictT =
+	JsonWriterDictImpl<_KeyWriter, _ValWriter, std::string, std::string>;
+
+using JsonWriterKey =
+	JsonWriterKeyImpl<
+		JsonWriterNull,
+		JsonWriterNumeric,
+		JsonWriterString,
+		std::string,
+		std::string>;
+
+using JsonWriterObject =
+	JsonWriterObjectImpl<
+		JsonWriterNull,
+		JsonWriterNumeric,
+		JsonWriterString,
+		JsonWriterKey,
+		std::string,
+		std::string>;
 
 } // namespace SimpleJson

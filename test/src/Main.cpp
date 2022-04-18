@@ -12,7 +12,7 @@ namespace SimpleJson_Test
 
 int main(int argc, char** argv)
 {
-	constexpr size_t EXPECTED_NUM_OF_TEST_FILE = 8;
+	constexpr size_t EXPECTED_NUM_OF_TEST_FILE = 9;
 
 	std::cout << "===== SimpleJson test program =====" << std::endl;
 	std::cout << std::endl;

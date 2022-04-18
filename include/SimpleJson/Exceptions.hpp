@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "SimpleObjects.hpp"
+#include "Internal/SimpleObjects.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 namespace SimpleJson
@@ -15,9 +15,25 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 {
 
 /**
+ * @brief Parent class of all SimpleJson exceptions
+ *
+ */
+class Exception : public Internal::Obj::Exception
+{
+public:
+
+	using Internal::Obj::Exception::Exception;
+
+	// LCOV_EXCL_START
+	virtual ~Exception() = default;
+	// LCOV_EXCL_STOP
+
+}; // class Exception
+
+/**
  * @brief This exception is thrown when error occurred during parsing.
  */
-class ParseError : public Internal::Obj::Exception
+class ParseError : public Exception
 {
 public:
 
@@ -68,5 +84,29 @@ private:
 	size_t m_lineNum;
 	size_t m_colNum;
 }; // class ParseError
+
+/**
+ * @brief This exception is thrown when error occurred during writing object to
+ *        JSON string.
+ */
+class SerializeTypeError : public Exception
+{
+
+public:
+
+	explicit SerializeTypeError(
+		const std::string typeName) :
+		Exception("Cannot serialize type " + typeName + " into JSON string")
+	{}
+
+	// LCOV_EXCL_START
+	/**
+	 * @brief Destroy the SerializeTypeError object
+	 *
+	 */
+	virtual ~SerializeTypeError() = default;
+	// LCOV_EXCL_STOP
+
+}; // class SerializeTypeError
 
 } // namespace SimpleJson

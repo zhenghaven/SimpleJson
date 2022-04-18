@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <SimpleJson/InputStateMachine.hpp>
-#include <SimpleJson/SimpleObjects.hpp>
+#include <SimpleJson/Internal/SimpleObjects.hpp>
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
 using namespace SimpleJson;
@@ -24,6 +24,7 @@ namespace SimpleJson_Test
 GTEST_TEST(TestInputStateMachine, CountTestFile)
 {
 	static auto tmp = ++SimpleJson_Test::g_numOfTestFile;
+	(void)tmp;
 }
 
 GTEST_TEST(TestInputStateMachine, Construction)

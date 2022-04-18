@@ -44,5 +44,20 @@ inline _ItType SkipLeadingSpace(_ItType begin, _ItType end)
 	return begin;
 }
 
+template<typename _OutIt, typename _InIt>
+inline void RepeatOutput(_OutIt out, _InIt begin, _InIt end, size_t repTime)
+{
+	for (size_t i = 0; i < repTime; ++i)
+	{
+		std::copy(begin, end, out);
+	}
+}
+
+template<typename _OutIt, typename _Container>
+inline void RepeatOutput(_OutIt out, const _Container& ctn, size_t repTime)
+{
+	RepeatOutput(out, ctn.begin(), ctn.end(), repTime);
+}
+
 } // namespace Internal
 } // namespace SimpleJson
