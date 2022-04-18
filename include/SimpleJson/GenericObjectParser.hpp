@@ -87,6 +87,13 @@ public: // static members:
 		Self,
 		_DictType<_HashObjType, RetType> >;
 
+	using NullParserPtr = std::unique_ptr<NullParser>;
+	using BoolParserPtr = std::unique_ptr<BoolParser>;
+	using GenericNumberParserPtr = std::unique_ptr<GenericNumberParser>;
+	using StringParserPtr = std::unique_ptr<StringParser>;
+	using ListParserPtr = std::unique_ptr<ListParser>;
+	using DictParserPtr = std::unique_ptr<DictParser>;
+
 public:
 
 	GenericObjectParserImpl() = default;
@@ -97,6 +104,90 @@ public:
 
 	using Base::Parse;
 
+	virtual const NullParser* GetNullParser() const
+	{
+		if (!m_nullParser)
+		{
+			m_nullParser = Internal::make_unique<NullParser>();
+		}
+		return m_nullParser.get();
+	}
+
+	virtual const BoolParser* GetBoolParser() const
+	{
+		if (!m_boolParser)
+		{
+			m_boolParser = Internal::make_unique<BoolParser>();
+		}
+		return m_boolParser.get();
+	}
+
+	virtual const GenericNumberParser* GetNumberParser() const
+	{
+		if (!m_numberParser)
+		{
+			m_numberParser = Internal::make_unique<GenericNumberParser>();
+		}
+		return m_numberParser.get();
+	}
+
+	virtual const StringParser* GetStringParser() const
+	{
+		if (!m_stringParser)
+		{
+			m_stringParser = Internal::make_unique<StringParser>();
+		}
+		return m_stringParser.get();
+	}
+
+	virtual const ListParser* GetListParser() const
+	{
+		if (!m_listParser)
+		{
+			m_listParser = Internal::make_unique<ListParser>();
+		}
+		return m_listParser.get();
+	}
+
+	virtual const DictParser* GetDictParser() const
+	{
+		if (!m_dictParser)
+		{
+			m_dictParser = Internal::make_unique<DictParser>();
+		}
+		return m_dictParser.get();
+	}
+
+	virtual void SetNullParser(NullParserPtr p)
+	{
+		m_nullParser = std::move(p);
+	}
+
+	virtual void SetBoolParser(BoolParserPtr p)
+	{
+		m_boolParser = std::move(p);
+	}
+
+	virtual void SetNumberParser(GenericNumberParserPtr p)
+	{
+		m_numberParser = std::move(p);
+	}
+
+	virtual void SetStringParser(StringParserPtr p)
+	{
+		m_stringParser = std::move(p);
+	}
+
+	virtual void SetListParser(ListParserPtr p)
+	{
+		m_listParser = std::move(p);
+	}
+
+	virtual void SetDictParser(DictParserPtr p)
+	{
+		m_dictParser = std::move(p);
+	}
+
 	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const override
 	{
 		auto ch = ism.SkipSpaceAndGetChar();
@@ -104,10 +195,10 @@ public:
 		switch(ch)
 		{
 			case 'n':   // null   -- Null
-				return NullParser().Parse(ism);
+				return GetNullParser()->Parse(ism);
 			case 't':   // true   -- Bool
 			case 'f':   // false  -- Bool
-				return BoolParser().Parse(ism);
+				return GetBoolParser()->Parse(ism);
 			case '-':
 			case '0':
 			case '1':
@@ -119,13 +210,13 @@ public:
 			case '7':
 			case '8':
 			case '9':
-				return GenericNumberParser().Parse(ism);
+				return GetNumberParser()->Parse(ism);
 			case '\"':  // "..."  -- String
-				return StringParser().Parse(ism);
+				return GetStringParser()->Parse(ism);
 			case '[':   // []     -- List
-				return ListParser().Parse(ism);
+				return GetListParser()->Parse(ism);
 			case '{':   // {}     -- Dict
-				return DictParser().Parse(ism);
+				return GetDictParser()->Parse(ism);
 			default:
 				break;
 		}
@@ -133,6 +224,15 @@ public:
 		throw ParseError("Unexpected character",
 			ism.GetLineCount(), ism.GetColCount());
 	}
+
+private:
+
+	mutable NullParserPtr m_nullParser;
+	mutable BoolParserPtr m_boolParser;
+	mutable GenericNumberParserPtr m_numberParser;
+	mutable StringParserPtr m_stringParser;
+	mutable ListParserPtr m_listParser;
+	mutable DictParserPtr m_dictParser;
 
 }; // class GenericObjectParserImpl
 

@@ -94,6 +94,12 @@ public:
 
 	using Base::Parse;
 
+	virtual const ValParser* GetValParser(
+		const typename KeyParser::RetType&) const
+	{
+		return m_valParser.get();
+	}
+
 	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const override
 	{
 		ObjType d;
@@ -113,7 +119,7 @@ public:
 			{
 				auto k = m_keyParser->Parse(ism);
 				ism.ExpDelimiter(':');
-				auto v = m_valParser->Parse(ism);
+				auto v = GetValParser(k)->Parse(ism);
 				d.InsertOrAssign(std::move(k), std::move(v));
 			}
 
@@ -125,7 +131,7 @@ public:
 
 				auto k = m_keyParser->Parse(ism);
 				ism.ExpDelimiter(':');
-				auto v = m_valParser->Parse(ism);
+				auto v = GetValParser(k)->Parse(ism);
 				d.InsertOrAssign(std::move(k), std::move(v));
 
 				ch = ism.SkipSpaceAndGetChar();

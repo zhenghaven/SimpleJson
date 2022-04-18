@@ -12,7 +12,7 @@ namespace SimpleJson_Test
 
 int main(int argc, char** argv)
 {
-	constexpr size_t EXPECTED_NUM_OF_TEST_FILE = 9;
+	constexpr size_t EXPECTED_NUM_OF_TEST_FILE = 10;
 
 	std::cout << "===== SimpleJson test program =====" << std::endl;
 	std::cout << std::endl;
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	{
 		std::cout << "********************************************************************************" << std::endl;
 		std::cout << "***** WARNING: Expecting " << EXPECTED_NUM_OF_TEST_FILE;
-		std::cout << " testing source files, but only ";
+		std::cout << " testing source files, but ";
 		std::cout << SimpleJson_Test::g_numOfTestFile << " were ran. *****" << std::endl;
 		std::cout << "********************************************************************************" << std::endl;
 

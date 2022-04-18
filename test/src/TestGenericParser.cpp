@@ -157,6 +157,14 @@ GTEST_TEST(TestGenericParser, InternalDictParseCorrect)
 GTEST_TEST(TestGenericParser, ParseError)
 {
 	GenericObjectParser parser;
+	parser.SetNullParser(Internal::make_unique<NullParser>());
+	parser.SetBoolParser(Internal::make_unique<BoolParser>());
+	parser.SetNumberParser(Internal::make_unique<GenericNumberParser>());
+	parser.SetStringParser(Internal::make_unique<StringParser>());
+	parser.SetListParser(Internal::make_unique<
+		typename GenericObjectParser::ListParser>());
+	parser.SetDictParser(Internal::make_unique<
+		typename GenericObjectParser::DictParser>());
 
 	{
 		std::string testInput = " [+1]   ";
