@@ -27,6 +27,13 @@ GTEST_TEST(TestInputStateMachine, CountTestFile)
 	(void)tmp;
 }
 
+GTEST_TEST(TestInputStateMachine, ParseErrorException)
+{
+	auto e = ParseError("Test ParseError", 123, 456);
+	EXPECT_EQ(e.GetLineNum(), 123);
+	EXPECT_EQ(e.GetColNum(), 456);
+}
+
 GTEST_TEST(TestInputStateMachine, Construction)
 {
 	std::string testInput = "test string";

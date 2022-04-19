@@ -79,6 +79,16 @@ public:
 	virtual ~ParseError() = default;
 	// LCOV_EXCL_STOP
 
+	size_t GetLineNum() const noexcept
+	{
+		return m_lineNum;
+	}
+
+	size_t GetColNum() const noexcept
+	{
+		return m_colNum;
+	}
+
 private:
 
 	size_t m_lineNum;

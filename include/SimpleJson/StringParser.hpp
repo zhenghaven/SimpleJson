@@ -56,9 +56,15 @@ public:
 
 	using Base::Parse;
 
-	// definition: https://datatracker.ietf.org/doc/html/rfc7159#section-7
-
 	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const override
+	{
+		return Parse2Obj(ism);
+	}
+
+protected:
+
+	// definition: https://datatracker.ietf.org/doc/html/rfc7159#section-7
+	ObjType Parse2Obj(InputStateMachineIf<InputChType>& ism) const
 	{
 		auto res = ObjType();
 		auto ch = ism.SkipSpaceAndGetCharAndAdv();
