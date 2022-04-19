@@ -248,6 +248,7 @@ GTEST_TEST(TestStaticDictParser, ParseError)
 {
 	using namespace Internal::Obj;
 
+	// not allow missing item
 	{
 		TestStaticDict2ParserT<false, true> dict2Parser;
 		auto testProg01 = [&]()
@@ -257,6 +258,7 @@ GTEST_TEST(TestStaticDictParser, ParseError)
 		EXPECT_THROW(testProg01();, ParseError);
 	}
 
+	// not allow extra item
 	{
 		TestStaticDict2ParserT<true, false> dict2Parser;
 		auto testProg02 = [&]()

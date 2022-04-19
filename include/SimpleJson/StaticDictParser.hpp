@@ -180,7 +180,7 @@ public:
 	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const override
 	{
 		TupleCore resTp;
-		_ParsedValChecklist checklist;
+		_ParsedValChecklist checklist = { 0 };
 
 		auto ch = ism.SkipSpaceAndGetCharAndAdv();
 
@@ -191,7 +191,7 @@ public:
 			if (ch == '}')
 			{
 				ism.GetCharAndAdv(); // consume '}'
-				CheckMissingItem(ism,checklist);
+				CheckMissingItem(ism, checklist);
 				return RetType(std::move(resTp));
 			}
 			else
@@ -214,7 +214,7 @@ public:
 			if (ch == '}')
 			{
 				ism.GetCharAndAdv(); // consume '}'
-				CheckMissingItem(ism,checklist);
+				CheckMissingItem(ism, checklist);
 				return RetType(std::move(resTp));
 			}
 		}
