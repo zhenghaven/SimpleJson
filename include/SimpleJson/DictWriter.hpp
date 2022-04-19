@@ -21,16 +21,14 @@ template<
 	typename _KeyWriter,
 	typename _ObjWriter,
 	typename _ToStringType,
-	typename _ContainerType>
-struct JsonWriterDictImpl
+	typename _ContainerType,
+	typename _DictTraits>
+struct JsonWriterDictBase
 {
-
-	using DictBase =
-		typename Internal::Obj::BaseObject<_ToStringType>::DictBase;
 
 	template<typename _OutputIt>
 	inline static void Write(_OutputIt destIt,
-		const DictBase& obj,
+		const typename _DictTraits::DictBase& obj,
 		const WriterConfig& config,
 		const WriterStates& state)
 	{
@@ -54,7 +52,7 @@ struct JsonWriterDictImpl
 			}
 
 			_KeyWriter::Write(destIt,
-				*(std::get<0>(*it)), config, stateNextLevel);
+				_DictTraits::GetKey(*it), config, stateNextLevel);
 
 			if (config.m_indent.size() > 0)
 			{
@@ -68,7 +66,7 @@ struct JsonWriterDictImpl
 			}
 
 			_ObjWriter::Write(destIt,
-				*(std::get<1>(*it)), config, stateNextLevel);
+				_DictTraits::GetVal(*it), config, stateNextLevel);
 
 			if (len != 1)
 			{
@@ -88,6 +86,89 @@ struct JsonWriterDictImpl
 		*destIt++ = '}';
 	}
 
+}; // struct JsonWriterDictBase
+
+template<typename _ToStringType>
+struct DynamicDictTraits
+{
+	using DictBase =
+		typename Internal::Obj::BaseObject<_ToStringType>::DictBase;
+
+	typedef typename DictBase::key_type               key_type;
+	typedef typename DictBase::mapped_type            mapped_type;
+
+	typedef typename DictBase::key_iterator           key_iterator;
+	typedef typename DictBase::const_mapped_iterator  const_mapped_iterator;
+
+	typedef std::tuple<key_iterator, const_mapped_iterator>  value_type;
+
+	static const key_type& GetKey(const value_type& it)
+	{
+		return *std::get<0>(it);
+	}
+
+	static const mapped_type& GetVal(const value_type& it)
+	{
+		return *std::get<1>(it);
+	}
+
+}; // struct DynamicDictTraits
+
+template<typename _ToStringType>
+struct StaticDictTraits
+{
+	using DictBase =
+		typename Internal::Obj::BaseObject<_ToStringType>::StatDictBase;
+
+	typedef typename DictBase::key_type               key_type;
+	typedef typename DictBase::mapped_type            mapped_type;
+
+	typedef typename DictBase::key_const_ref_type     key_const_ref_type;
+	typedef typename DictBase::mapped_const_ref_type  mapped_const_ref_type;
+
+	typedef std::pair<const key_const_ref_type, const mapped_const_ref_type>
+		value_type;
+
+	static const key_type& GetKey(const value_type& it)
+	{
+		return it.first.get();
+	}
+
+	static const mapped_type& GetVal(const value_type& it)
+	{
+		return it.second.get();
+	}
+
+}; // struct StaticDictTraits
+
+template<
+	typename _KeyWriter,
+	typename _ObjWriter,
+	typename _ToStringType,
+	typename _ContainerType>
+struct JsonWriterDictImpl :
+	public JsonWriterDictBase<
+		_KeyWriter,
+		_ObjWriter,
+		_ToStringType,
+		_ContainerType,
+		DynamicDictTraits<_ToStringType> >
+{
+}; // struct JsonWriterDictImpl
+
+template<
+	typename _KeyWriter,
+	typename _ObjWriter,
+	typename _ToStringType,
+	typename _ContainerType>
+struct JsonWriterStaticDictImpl :
+	public JsonWriterDictBase<
+		_KeyWriter,
+		_ObjWriter,
+		_ToStringType,
+		_ContainerType,
+		StaticDictTraits<_ToStringType> >
+{
 }; // struct JsonWriterDictImpl
 
 } // namespace SimpleJson

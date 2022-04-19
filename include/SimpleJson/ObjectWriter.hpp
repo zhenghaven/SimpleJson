@@ -87,6 +87,8 @@ struct JsonWriterObjectImpl
 	using KeyWriter  = _KeyWriter;
 	using DictWriter =
 		JsonWriterDictImpl<KeyWriter, Self, _ToStringType, _ContainerType>;
+	using StaticDictWriter =
+		JsonWriterStaticDictImpl<KeyWriter, Self, _ToStringType, _ContainerType>;
 
 	template<typename _OutputIt>
 	inline static void Write(_OutputIt destIt,
@@ -112,6 +114,9 @@ struct JsonWriterObjectImpl
 			break;
 		case Internal::Obj::ObjCategory::Dict:
 			DictWriter::Write(destIt, obj.AsDict(), config, state);
+			break;
+		case Internal::Obj::ObjCategory::StaticDict:
+			StaticDictWriter::Write(destIt, obj.AsStaticDict(), config, state);
 			break;
 		default:
 			throw SerializeTypeError(obj.GetCategoryName());

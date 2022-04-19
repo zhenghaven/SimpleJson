@@ -13,6 +13,7 @@
 #include "NumericParser.hpp"
 #include "ListParser.hpp"
 #include "DictParser.hpp"
+#include "StaticDictParser.hpp"
 
 #include "GenericObjectParser.hpp"
 
@@ -71,6 +72,20 @@ using GenericObjectParser = GenericObjectParserImpl<
 	Internal::Obj::DictT,
 	Internal::Obj::Object>;
 
+template<
+	typename _ParserTp,
+	bool _AllowMissingItem,
+	bool _AllowExtraItem>
+using StaticDictParserT = StaticDictParserImpl<
+	std::string,
+	StringParser,
+	_ParserTp,
+	GenericObjectParser,
+	_AllowMissingItem,
+	_AllowExtraItem,
+	Internal::Obj::StaticDict<
+		typename Internal::DParserTuple2TupleCore<_ParserTp>::type> >;
+
 // ===================== Writers =====================
 
 using JsonWriterNull = JsonWriterNullImpl<std::string>;
@@ -86,6 +101,10 @@ using JsonWriterListT =
 template<typename _KeyWriter, typename _ValWriter>
 using JsonWriterDictT =
 	JsonWriterDictImpl<_KeyWriter, _ValWriter, std::string, std::string>;
+
+template<typename _KeyWriter, typename _ValWriter>
+using JsonWriterStaticDictT =
+	JsonWriterStaticDictImpl<_KeyWriter, _ValWriter, std::string, std::string>;
 
 using JsonWriterKey =
 	JsonWriterKeyImpl<
