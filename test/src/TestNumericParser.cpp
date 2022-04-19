@@ -215,73 +215,75 @@ GTEST_TEST(TestNumericParser, InternalParserIncorrect)
 
 GTEST_TEST(TestNullParser, GenericNumParseCorrect)
 {
+	using namespace Internal::Obj;
+
 	GenericNumberParser parser;
 	{
 		std::string testInput = " \t 123456789   ";
-		Internal::Obj::Object res;
+		Object res;
 		EXPECT_NO_THROW(
 			res = parser.Parse(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
 				res.AsNumeric().GetNumType() ==
-				Internal::Obj::NumericType::Int64));
-		EXPECT_EQ(res, Internal::Obj::Int64(123456789LL));
+				NumericType::Int64));
+		EXPECT_EQ(res, Object(Int64(123456789LL)));
 		EXPECT_NO_THROW(
 			res = parser.ParseTillEnd(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
 				res.AsNumeric().GetNumType() ==
-				Internal::Obj::NumericType::Int64));
-		EXPECT_EQ(res, Internal::Obj::Int64(123456789LL));
+				NumericType::Int64));
+		EXPECT_EQ(res, Object(Int64(123456789LL)));
 	}
 
 	{
 		std::string testInput = " \r\n 123456789;   ";
-		Internal::Obj::Object res;
+		Object res;
 		EXPECT_NO_THROW(
 			res = parser.Parse(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
 				res.AsNumeric().GetNumType() ==
-				Internal::Obj::NumericType::Int64));
-		EXPECT_EQ(res, Internal::Obj::Int64(123456789LL));
+				NumericType::Int64));
+		EXPECT_EQ(res, Object(Int64(123456789LL)));
 	}
 
 	{
 		std::string testInput = " \t 12345.6789   ";
-		Internal::Obj::Object res;
+		Object res;
 		EXPECT_NO_THROW(
 			res = parser.Parse(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
 				res.AsNumeric().GetNumType() ==
-				Internal::Obj::NumericType::Double));
-		EXPECT_EQ(res, Internal::Obj::Double(12345.6789));
+				NumericType::Double));
+		EXPECT_EQ(res, Object(Double(12345.6789)));
 		EXPECT_NO_THROW(
 			res = parser.ParseTillEnd(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
 				res.AsNumeric().GetNumType() ==
-				Internal::Obj::NumericType::Double));
-		EXPECT_EQ(res, Internal::Obj::Double(12345.6789));
+				NumericType::Double));
+		EXPECT_EQ(res, Object(Double(12345.6789)));
 	}
 
 	{
 		std::string testInput = " \r\n 12345.6789;   ";
-		Internal::Obj::Object res;
+		Object res;
 		EXPECT_NO_THROW(
 			res = parser.Parse(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
 				res.AsNumeric().GetNumType() ==
-				Internal::Obj::NumericType::Double));
-		EXPECT_EQ(res, Internal::Obj::Double(12345.6789));
+				NumericType::Double));
+		EXPECT_EQ(res, Object(Double(12345.6789)));
 	}
 }
 

@@ -286,12 +286,12 @@ GTEST_TEST(TestSpecialParser, SpecParse)
 	{
 		auto obj1 = dictParser.Parse(sk_testInput_v01);
 		auto obj2 = genericParser.Parse(sk_testInput_v01);
-		EXPECT_EQ(obj1, obj2);
+		EXPECT_NO_THROW(EXPECT_EQ(obj1, obj2.AsDict()));
 	}
 	{
 		auto obj1 = dictParser.Parse(sk_testInput_v02);
 		auto obj2 = genericParser.Parse(sk_testInput_v02);
-		EXPECT_EQ(obj1, obj2);
+		EXPECT_NO_THROW(EXPECT_EQ(obj1, obj2.AsDict()));
 	}
 
 	// Invalid input
