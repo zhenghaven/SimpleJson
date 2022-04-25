@@ -47,7 +47,7 @@ struct JsonWriterKeyImpl
 		case Internal::Obj::ObjCategory::Integer:
 		case Internal::Obj::ObjCategory::Real:
 			*destIt++ = '\"';
-			NumWriter::Write(destIt, obj.AsNumeric(), config, state);
+			NumWriter::Write(destIt, obj.AsRealNum(), config, state);
 			*destIt++ = '\"';
 			break;
 		case Internal::Obj::ObjCategory::String:
@@ -104,7 +104,7 @@ struct JsonWriterObjectImpl
 		case Internal::Obj::ObjCategory::Bool:
 		case Internal::Obj::ObjCategory::Integer:
 		case Internal::Obj::ObjCategory::Real:
-			NumWriter::Write(destIt, obj.AsNumeric(), config, state);
+			NumWriter::Write(destIt, obj.AsRealNum(), config, state);
 			break;
 		case Internal::Obj::ObjCategory::String:
 			StrWriter::Write(destIt, obj.AsString(), config, state);

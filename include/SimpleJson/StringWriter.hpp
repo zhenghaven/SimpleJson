@@ -138,6 +138,6 @@ struct JsonWriterStringImpl
 
 	}
 
-}; // struct JsonWriterNumericImpl
+}; // struct JsonWriterRealNumImpl
 
 } // namespace SimpleJson
