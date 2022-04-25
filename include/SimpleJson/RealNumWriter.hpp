@@ -16,11 +16,11 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 {
 
 template<typename _ToStringType>
-struct JsonWriterNumericImpl
+struct JsonWriterRealNumImpl
 {
 	template<typename _OutputIt>
 	inline static void WriteBool(_OutputIt it,
-		const Internal::Obj::NumericBaseObject<_ToStringType>& obj,
+		const Internal::Obj::RealNumBaseObject<_ToStringType>& obj,
 		const WriterConfig&,
 		const WriterStates&)
 	{
@@ -43,7 +43,7 @@ struct JsonWriterNumericImpl
 
 	template<typename _OutputIt>
 	inline static void WriteNumber(_OutputIt it,
-		const Internal::Obj::NumericBaseObject<_ToStringType>& obj,
+		const Internal::Obj::RealNumBaseObject<_ToStringType>& obj,
 		const WriterConfig&,
 		const WriterStates&)
 	{
@@ -53,19 +53,19 @@ struct JsonWriterNumericImpl
 
 	template<typename _OutputIt>
 	inline static void Write(_OutputIt it,
-		const Internal::Obj::NumericBaseObject<_ToStringType>& obj,
+		const Internal::Obj::RealNumBaseObject<_ToStringType>& obj,
 		const WriterConfig& config,
 		const WriterStates& state)
 	{
 		switch (obj.GetNumType())
 		{
-		case Internal::Obj::NumericType::Bool:
+		case Internal::Obj::RealNumType::Bool:
 			return WriteBool(it, obj, config, state);
 
 		default:
 			return WriteNumber(it, obj, config, state);
 		}
 	}
-}; // struct JsonWriterNumericImpl
+}; // struct JsonWriterRealNumImpl
 
 } // namespace SimpleJson

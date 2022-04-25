@@ -18,7 +18,7 @@ namespace SimpleJson_Test
 	extern size_t g_numOfTestFile;
 }
 
-GTEST_TEST(TestNumericParser, CountTestFile)
+GTEST_TEST(TestRealNumParser, CountTestFile)
 {
 	static auto tmp = ++SimpleJson_Test::g_numOfTestFile;
 	(void)tmp;
@@ -80,7 +80,7 @@ static void TestInternalParserIncorrect(
 	);
 }
 
-GTEST_TEST(TestNumericParser, InternalParserCorrect)
+GTEST_TEST(TestRealNumParser, InternalParserCorrect)
 {
 	TestInternalParserCorrect("   \r\n  ",
 		"0", "",
@@ -150,7 +150,7 @@ GTEST_TEST(TestNumericParser, InternalParserCorrect)
 	}
 }
 
-GTEST_TEST(TestNumericParser, InternalParserIncorrect)
+GTEST_TEST(TestRealNumParser, InternalParserIncorrect)
 {
 	TestInternalParserIncorrect("   \r\n  ",
 		"", "",
@@ -226,16 +226,16 @@ GTEST_TEST(TestNullParser, GenericNumParseCorrect)
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
-				res.AsNumeric().GetNumType() ==
-				NumericType::Int64));
+				res.AsRealNum().GetNumType() ==
+				RealNumType::Int64));
 		EXPECT_EQ(res, Object(Int64(123456789LL)));
 		EXPECT_NO_THROW(
 			res = parser.ParseTillEnd(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
-				res.AsNumeric().GetNumType() ==
-				NumericType::Int64));
+				res.AsRealNum().GetNumType() ==
+				RealNumType::Int64));
 		EXPECT_EQ(res, Object(Int64(123456789LL)));
 	}
 
@@ -247,8 +247,8 @@ GTEST_TEST(TestNullParser, GenericNumParseCorrect)
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
-				res.AsNumeric().GetNumType() ==
-				NumericType::Int64));
+				res.AsRealNum().GetNumType() ==
+				RealNumType::Int64));
 		EXPECT_EQ(res, Object(Int64(123456789LL)));
 	}
 
@@ -260,16 +260,16 @@ GTEST_TEST(TestNullParser, GenericNumParseCorrect)
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
-				res.AsNumeric().GetNumType() ==
-				NumericType::Double));
+				res.AsRealNum().GetNumType() ==
+				RealNumType::Double));
 		EXPECT_EQ(res, Object(Double(12345.6789)));
 		EXPECT_NO_THROW(
 			res = parser.ParseTillEnd(testInput);
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
-				res.AsNumeric().GetNumType() ==
-				NumericType::Double));
+				res.AsRealNum().GetNumType() ==
+				RealNumType::Double));
 		EXPECT_EQ(res, Object(Double(12345.6789)));
 	}
 
@@ -281,8 +281,8 @@ GTEST_TEST(TestNullParser, GenericNumParseCorrect)
 		);
 		EXPECT_NO_THROW(
 			EXPECT_TRUE(
-				res.AsNumeric().GetNumType() ==
-				NumericType::Double));
+				res.AsRealNum().GetNumType() ==
+				RealNumType::Double));
 		EXPECT_EQ(res, Object(Double(12345.6789)));
 	}
 }

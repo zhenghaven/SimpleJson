@@ -247,7 +247,7 @@ private:
 
 // LCOV_EXCL_STOP
 
-}
+} // namespace
 
 GTEST_TEST(TestSpecialParser, Construct)
 {

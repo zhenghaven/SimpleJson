@@ -43,7 +43,7 @@ GTEST_TEST(TestJsonWriter, BoolWriter)
 		WriterConfig cfg;
 		WriterStates st;
 
-		JsonWriterNumeric::Write(
+		JsonWriterRealNum::Write(
 			std::back_inserter(res),
 			Internal::Obj::Bool(true),
 			cfg, st);
@@ -51,7 +51,7 @@ GTEST_TEST(TestJsonWriter, BoolWriter)
 
 		res = "";
 
-		JsonWriterNumeric::Write(
+		JsonWriterRealNum::Write(
 			std::back_inserter(res),
 			Internal::Obj::Bool(false),
 			cfg, st);
@@ -65,7 +65,7 @@ GTEST_TEST(TestJsonWriter, NumWriter)
 		std::string res;
 		WriterConfig cfg;
 
-		JsonWriterNumeric::Write(
+		JsonWriterRealNum::Write(
 			std::back_inserter(res),
 			Internal::Obj::Int64(1234567890LL),
 			cfg, WriterStates());
@@ -73,7 +73,7 @@ GTEST_TEST(TestJsonWriter, NumWriter)
 
 		res = "";
 
-		JsonWriterNumeric::Write(
+		JsonWriterRealNum::Write(
 			std::back_inserter(res),
 			Internal::Obj::Double(123.0),
 			cfg, WriterStates());
@@ -81,7 +81,7 @@ GTEST_TEST(TestJsonWriter, NumWriter)
 
 		res = "";
 
-		JsonWriterNumeric::Write(
+		JsonWriterRealNum::Write(
 			std::back_inserter(res),
 			Internal::Obj::Double(0.0),
 			cfg, WriterStates());
@@ -132,6 +132,25 @@ GTEST_TEST(TestJsonWriter, StringWriter)
 			Internal::Obj::String("\xe6\xb5\x8b\xe8\xaf\x95"),
 			cfg, st);
 		EXPECT_EQ(res, "\"\\u6D4B\\u8BD5\"");
+	}
+}
+
+GTEST_TEST(TestJsonWriter, UnserializableType)
+{
+	{
+		Internal::Obj::Dict dict1({
+			{Internal::Obj::Bytes({ 0x20U, 0x21U, }), Internal::Obj::String("TestVal")}
+		});
+
+		EXPECT_THROW(DumpStr(dict1), SerializeTypeError);
+	}
+
+	{
+		Internal::Obj::Dict dict1({
+			{Internal::Obj::String("TestKey"), Internal::Obj::Bytes({ 0x20U, 0x21U, })}
+		});
+
+		EXPECT_THROW(DumpStr(dict1), SerializeTypeError);
 	}
 }
 
@@ -237,13 +256,7 @@ GTEST_TEST(TestJsonWriter, ListWriter)
 		WriterConfig cfg;
 		cfg.m_indent = "\t";
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			inputObj,
-			cfg,
-			WriterStates()
-		);
+		std::string res = DumpStr(inputObj, cfg);
 
 		EXPECT_EQ(res, sk_listTestInput_01);
 	}
@@ -253,13 +266,7 @@ GTEST_TEST(TestJsonWriter, ListWriter)
 
 		WriterConfig cfg;
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			inputObj,
-			cfg,
-			WriterStates()
-		);
+		std::string res = DumpStr(inputObj, cfg);
 
 		EXPECT_EQ(res, sk_listTestInput_02);
 	}
@@ -267,21 +274,13 @@ GTEST_TEST(TestJsonWriter, ListWriter)
 
 GTEST_TEST(TestJsonWriter, DictWriter)
 {
-	GenericObjectParser parser;
-
 	{
-		auto inputObj = parser.ParseTillEnd(sk_dictTestInput_01_a);
+		auto inputObj = LoadStr(sk_dictTestInput_01_a);
 
 		WriterConfig cfg;
 		cfg.m_indent = "\t";
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			inputObj,
-			cfg,
-			WriterStates()
-		);
+		std::string res = DumpStr(inputObj, cfg);
 
 		EXPECT_TRUE((res == sk_dictTestInput_01_a) ||
 					(res == sk_dictTestInput_01_b) ||
@@ -290,17 +289,9 @@ GTEST_TEST(TestJsonWriter, DictWriter)
 	}
 
 	{
-		auto inputObj = parser.ParseTillEnd(sk_dictTestInput_01_a);
+		auto inputObj = LoadStr(sk_dictTestInput_01_a);
 
-		WriterConfig cfg;
-
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			inputObj,
-			cfg,
-			WriterStates()
-		);
+		std::string res = DumpStr(inputObj);
 
 		EXPECT_TRUE((res == sk_dictTestInput_02_a) ||
 					(res == sk_dictTestInput_02_b) ||
@@ -317,13 +308,7 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 			{Internal::Obj::Null(), Internal::Obj::Null()}
 		});
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			testObj,
-			WriterConfig(),
-			WriterStates()
-		);
+		std::string res = DumpStr(testObj);
 		EXPECT_EQ(res, "{\"null\":null}");
 	}
 
@@ -333,13 +318,7 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 			{Internal::Obj::Bool(true), Internal::Obj::Bool(true)}
 		});
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			testObj,
-			WriterConfig(),
-			WriterStates()
-		);
+		std::string res = DumpStr(testObj);
 		EXPECT_EQ(res, "{\"true\":true}");
 	}
 
@@ -349,13 +328,7 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 			{Internal::Obj::Bool(false), Internal::Obj::Bool(false)}
 		});
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			testObj,
-			WriterConfig(),
-			WriterStates()
-		);
+		std::string res = DumpStr(testObj);
 		EXPECT_EQ(res, "{\"false\":false}");
 	}
 
@@ -365,13 +338,7 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 			{Internal::Obj::Int64(123456), Internal::Obj::Int64(123456)}
 		});
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			testObj,
-			WriterConfig(),
-			WriterStates()
-		);
+		std::string res = DumpStr(testObj);
 		EXPECT_EQ(res, "{\"123456\":123456}");
 	}
 
@@ -381,13 +348,7 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 			{Internal::Obj::Double(0.0), Internal::Obj::Double(0.0)}
 		});
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			testObj,
-			WriterConfig(),
-			WriterStates()
-		);
+		std::string res = DumpStr(testObj);
 		EXPECT_EQ(res, "{\"0.0\":0.0}");
 	}
 
@@ -397,13 +358,7 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 			{Internal::Obj::String("string"), Internal::Obj::String("string")}
 		});
 
-		std::string res;
-		JsonWriterObject::Write(
-			std::back_inserter(res),
-			testObj,
-			WriterConfig(),
-			WriterStates()
-		);
+		std::string res = DumpStr(testObj);
 		EXPECT_EQ(res, "{\"string\":\"string\"}");
 	}
 }

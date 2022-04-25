@@ -10,14 +10,15 @@
 #include "NullParser.hpp"
 #include "BoolParser.hpp"
 #include "StringParser.hpp"
-#include "NumericParser.hpp"
+#include "RealNumParser.hpp"
 #include "ListParser.hpp"
 #include "DictParser.hpp"
+#include "StaticDictParser.hpp"
 
 #include "GenericObjectParser.hpp"
 
 #include "NullWriter.hpp"
-#include "NumericWriter.hpp"
+#include "RealNumWriter.hpp"
 #include "StringWriter.hpp"
 #include "ListWriter.hpp"
 #include "DictWriter.hpp"
@@ -30,37 +31,41 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 #endif
 {
 
-using NullParser = NullParserImpl<std::string, Internal::Obj::Null>;
-using BoolParser = BoolParserImpl<std::string, Internal::Obj::Bool>;
-using StringParser = StringParserImpl<std::string, Internal::Obj::String>;
+using IMContainerType = std::string;
+using ToStringType    = std::string;
+
+using NullParser = NullParserImpl<IMContainerType, Internal::Obj::Null>;
+using BoolParser = BoolParserImpl<IMContainerType, Internal::Obj::Bool>;
+using StringParser = StringParserImpl<IMContainerType, Internal::Obj::String>;
 
 using DictKeyParser = StringParserImpl<
-	std::string, Internal::Obj::String, Internal::Obj::HashableObject>;
+	IMContainerType, Internal::Obj::String, Internal::Obj::HashableObject>;
 
-using GenericNumberParser = GenericNumberParserImpl<std::string,
+using GenericNumberParser = GenericNumberParserImpl<
+	IMContainerType,
 	Internal::Obj::Int64,
 	Internal::Obj::Double,
 	Internal::Obj::Object>;
 
-using IntegerParser = IntegerParserImpl<std::string, Internal::Obj::Int64>;
-using RealNumParser = RealNumParserImpl<std::string, Internal::Obj::Double>;
+using IntegerParser = IntegerParserImpl<IMContainerType, Internal::Obj::Int64>;
+using RealNumParser = RealNumParserImpl<IMContainerType, Internal::Obj::Double>;
 
 template<typename _ItemParser>
 using ListParserT = ListParserImpl<
-	std::string,
+	IMContainerType,
 	_ItemParser,
 	Internal::Obj::ListT<typename _ItemParser::RetType> >;
 
 template<typename _ValParser>
 using DictParserT = DictParserImpl<
-	std::string,
+	IMContainerType,
 	DictKeyParser,
 	_ValParser,
 	Internal::Obj::DictT<
 		typename DictKeyParser::RetType, typename _ValParser::RetType> >;
 
 using GenericObjectParser = GenericObjectParserImpl<
-	std::string,
+	IMContainerType,
 	Internal::Obj::Null,
 	Internal::Obj::Bool,
 	Internal::Obj::Int64,
@@ -71,37 +76,55 @@ using GenericObjectParser = GenericObjectParserImpl<
 	Internal::Obj::DictT,
 	Internal::Obj::Object>;
 
+template<
+	typename _ParserTp,
+	bool _AllowMissingItem,
+	bool _AllowExtraItem>
+using StaticDictParserT = StaticDictParserImpl<
+	IMContainerType,
+	StringParser,
+	_ParserTp,
+	GenericObjectParser,
+	_AllowMissingItem,
+	_AllowExtraItem,
+	Internal::Obj::StaticDict<
+		typename Internal::DParserTuple2TupleCore<_ParserTp>::type> >;
+
 // ===================== Writers =====================
 
-using JsonWriterNull = JsonWriterNullImpl<std::string>;
+using JsonWriterNull = JsonWriterNullImpl<ToStringType>;
 
-using JsonWriterNumeric = JsonWriterNumericImpl<std::string>;
+using JsonWriterRealNum = JsonWriterRealNumImpl<ToStringType>;
 
-using JsonWriterString = JsonWriterStringImpl<char, std::string, std::string>;
+using JsonWriterString = JsonWriterStringImpl<char, ToStringType, IMContainerType>;
 
 template<typename _ValWriter>
 using JsonWriterListT =
-	JsonWriterListImpl<_ValWriter, std::string, std::string>;
+	JsonWriterListImpl<_ValWriter, ToStringType, IMContainerType>;
 
 template<typename _KeyWriter, typename _ValWriter>
 using JsonWriterDictT =
-	JsonWriterDictImpl<_KeyWriter, _ValWriter, std::string, std::string>;
+	JsonWriterDictImpl<_KeyWriter, _ValWriter, ToStringType, IMContainerType>;
+
+template<typename _KeyWriter, typename _ValWriter>
+using JsonWriterStaticDictT =
+	JsonWriterStaticDictImpl<_KeyWriter, _ValWriter, ToStringType, IMContainerType>;
 
 using JsonWriterKey =
 	JsonWriterKeyImpl<
 		JsonWriterNull,
-		JsonWriterNumeric,
+		JsonWriterRealNum,
 		JsonWriterString,
-		std::string,
-		std::string>;
+		ToStringType,
+		IMContainerType>;
 
 using JsonWriterObject =
 	JsonWriterObjectImpl<
 		JsonWriterNull,
-		JsonWriterNumeric,
+		JsonWriterRealNum,
 		JsonWriterString,
 		JsonWriterKey,
-		std::string,
-		std::string>;
+		ToStringType,
+		IMContainerType>;
 
 } // namespace SimpleJson

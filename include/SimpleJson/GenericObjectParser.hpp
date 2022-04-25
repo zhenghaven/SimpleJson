@@ -8,7 +8,7 @@
 #include "NullParser.hpp"
 #include "BoolParser.hpp"
 #include "StringParser.hpp"
-#include "NumericParser.hpp"
+#include "RealNumParser.hpp"
 #include "ListParser.hpp"
 #include "DictParser.hpp"
 

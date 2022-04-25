@@ -102,6 +102,13 @@ public:
 
 	virtual RetType Parse(InputStateMachineIf<InputChType>& ism) const override
 	{
+		return Parse2Obj(ism);
+	}
+
+protected:
+
+	ObjType Parse2Obj(InputStateMachineIf<InputChType>& ism) const
+	{
 		ObjType d;
 
 		auto ch = ism.SkipSpaceAndGetCharAndAdv();
