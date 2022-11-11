@@ -11,7 +11,6 @@ OPTION(SIMPLEJSON_TEST_CXX_STANDARD
 	"C++ standard version used to build SimpleJson test executable." 11)
 OPTION(SIMPLEJSON_TEST_LCOV "Option to turn on test code coverage." OFF)
 
-include(TestCoverage.cmake)
 
 ################################################################################
 # Set compile options
@@ -40,6 +39,14 @@ endif()
 ################################################################################
 
 include(FetchContent)
+
+FetchContent_Declare(
+	git_simplecmakescripts
+	GIT_REPOSITORY https://github.com/zhenghaven/SimpleCMakeScripts.git
+	GIT_TAG        v0.3
+)
+FetchContent_MakeAvailable(git_simplecmakescripts)
+simplecmakescripts_enable()
 
 FetchContent_Declare(
 	git_googletest
@@ -85,5 +92,7 @@ set_property(TARGET SimpleJson_test
 	PROPERTY CXX_STANDARD ${SIMPLEJSON_TEST_CXX_STANDARD})
 
 if (SIMPLEJSON_TEST_LCOV)
-	setup_cxx_test_coverage(SimpleJson_test "${PROJECT_SOURCE_DIR}/include")
+	include(SimpleTestCoverage)
+	message(STATUS "Setting up test coverage target...")
+	simple_cxx_test_coverage(SimpleJson_test "${PROJECT_SOURCE_DIR}/include")
 endif()

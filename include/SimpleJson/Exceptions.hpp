@@ -104,8 +104,7 @@ class SerializeTypeError : public Exception
 
 public:
 
-	explicit SerializeTypeError(
-		const std::string typeName) :
+	explicit SerializeTypeError(const std::string& typeName) :
 		Exception("Cannot serialize type " + typeName + " into JSON string")
 	{}
 

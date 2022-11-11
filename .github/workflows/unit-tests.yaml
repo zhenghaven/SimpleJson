@@ -19,11 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-22.04, windows-latest, macos-latest ]
         std: [ 11, 20 ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -50,3 +50,13 @@ jobs:
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}} -V
+
+
+    - name: Flaky Test
+      working-directory: ${{github.workspace}}/build
+      run: >
+        ctest
+        -C ${{env.BUILD_TYPE}}
+        --parallel 10
+        --repeat-until-fail 100
+        --output-on-failure

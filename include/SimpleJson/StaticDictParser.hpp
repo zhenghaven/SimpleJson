@@ -168,8 +168,7 @@ public: // static members:
 
 public:
 
-	StaticDictParserImpl()
-	{}
+	StaticDictParserImpl() = default;
 
 	// LCOV_EXCL_START
 	virtual ~StaticDictParserImpl() = default;
