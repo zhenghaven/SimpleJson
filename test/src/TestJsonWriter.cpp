@@ -5,6 +5,9 @@
 
 #include <gtest/gtest.h>
 
+#ifdef _MSC_VER
+#include <windows.h>
+#endif // _MSC_VER
 #include <SimpleJson/SimpleJson.hpp>
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
