@@ -249,7 +249,7 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 			inline _LowType StdNumberDownCast(const _HighType& highVal)
 			{
 				if (std::numeric_limits<_LowType>::lowest() <= highVal &&
-					highVal <= std::numeric_limits<_LowType>::max())
+					highVal <= (std::numeric_limits<_LowType>::max)())
 				{
 					return static_cast<_LowType>(highVal);
 				}

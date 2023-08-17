@@ -19,13 +19,15 @@ struct WriterConfig
 {
 	WriterConfig() :
 		m_indent(""),
-		m_lineEnd("\n")
+		m_lineEnd("\n"),
+		m_orderDict(false)
 	{}
 
 	~WriterConfig() = default;
 
 	std::string m_indent;
 	std::string m_lineEnd;
+	bool m_orderDict;
 
 }; // struct WriterConfig
 

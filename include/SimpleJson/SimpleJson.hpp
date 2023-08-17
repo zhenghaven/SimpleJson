@@ -3,6 +3,10 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+
+#pragma once
+
+
 #include "DefaultTypes.hpp"
 
 #ifndef SIMPLEJSON_CUSTOMIZED_NAMESPACE
@@ -28,7 +32,17 @@ struct FindObjWriter<Internal::Obj::Object>
 }; // struct FindObjWriter
 
 template<>
+struct FindObjWriter<Internal::Obj::BaseObj> :
+	public FindObjWriter<Internal::Obj::Object>
+{}; // struct FindObjWriter
+
+template<>
 struct FindObjWriter<Internal::Obj::HashableObject> :
+	public FindObjWriter<Internal::Obj::Object>
+{}; // struct FindObjWriter
+
+template<>
+struct FindObjWriter<Internal::Obj::HashableBaseObj> :
 	public FindObjWriter<Internal::Obj::Object>
 {}; // struct FindObjWriter
 

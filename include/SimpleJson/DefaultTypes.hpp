@@ -107,6 +107,10 @@ using JsonWriterDictT =
 	JsonWriterDictImpl<_KeyWriter, _ValWriter, ToStringType, IMContainerType>;
 
 template<typename _KeyWriter, typename _ValWriter>
+using JsonWriterOrdDictT =
+	JsonWriterOrdDictImpl<_KeyWriter, _ValWriter, ToStringType>;
+
+template<typename _KeyWriter, typename _ValWriter>
 using JsonWriterStaticDictT =
 	JsonWriterStaticDictImpl<_KeyWriter, _ValWriter, ToStringType, IMContainerType>;
 
