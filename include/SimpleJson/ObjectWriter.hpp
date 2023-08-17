@@ -87,6 +87,8 @@ struct JsonWriterObjectImpl
 	using KeyWriter  = _KeyWriter;
 	using DictWriter =
 		JsonWriterDictImpl<KeyWriter, Self, _ToStringType, _ContainerType>;
+	using OrdDictWriter =
+		JsonWriterOrdDictImpl<KeyWriter, Self, _ToStringType>;
 	using StaticDictWriter =
 		JsonWriterStaticDictImpl<KeyWriter, Self, _ToStringType, _ContainerType>;
 
@@ -113,7 +115,14 @@ struct JsonWriterObjectImpl
 			ListWriter::Write(destIt, obj.AsList(), config, state);
 			break;
 		case Internal::Obj::ObjCategory::Dict:
-			DictWriter::Write(destIt, obj.AsDict(), config, state);
+			if (config.m_orderDict)
+			{
+				OrdDictWriter::Write(destIt, obj.AsDict(), config, state);
+			}
+			else
+			{
+				DictWriter::Write(destIt, obj.AsDict(), config, state);
+			}
 			break;
 		case Internal::Obj::ObjCategory::StaticDict:
 			StaticDictWriter::Write(destIt, obj.AsStaticDict(), config, state);

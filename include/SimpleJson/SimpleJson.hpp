@@ -32,7 +32,17 @@ struct FindObjWriter<Internal::Obj::Object>
 }; // struct FindObjWriter
 
 template<>
+struct FindObjWriter<Internal::Obj::BaseObj> :
+	public FindObjWriter<Internal::Obj::Object>
+{}; // struct FindObjWriter
+
+template<>
 struct FindObjWriter<Internal::Obj::HashableObject> :
+	public FindObjWriter<Internal::Obj::Object>
+{}; // struct FindObjWriter
+
+template<>
+struct FindObjWriter<Internal::Obj::HashableBaseObj> :
 	public FindObjWriter<Internal::Obj::Object>
 {}; // struct FindObjWriter
 

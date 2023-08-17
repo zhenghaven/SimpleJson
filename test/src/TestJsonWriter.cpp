@@ -365,3 +365,69 @@ GTEST_TEST(TestJsonWriter, ObjectWriter)
 		EXPECT_EQ(res, "{\"string\":\"string\"}");
 	}
 }
+
+GTEST_TEST(TestJsonWriter, OrderedDictWriter)
+{
+	using _Str = Internal::Obj::String;
+	using _Dict = Internal::Obj::Dict;
+
+	WriterConfig config;
+	config.m_orderDict = true;
+
+	{
+		std::string expOut =
+			"{\"0\":0,\"1\":1,\"2\":2,\"a\":\"a\",\"b\":\"b\",\"c\":\"c\"}";
+		_Dict dict;
+		dict[_Str("a")] = _Str("a");
+		dict[_Str("b")] = _Str("b");
+		dict[_Str("c")] = _Str("c");
+		dict[_Str("0")] = Internal::Obj::Int64(0);
+		dict[_Str("1")] = Internal::Obj::Int64(1);
+		dict[_Str("2")] = Internal::Obj::Int64(2);
+
+		const Internal::Obj::BaseObj& obj = dict;
+		std::string res = DumpStr(obj, config);
+		EXPECT_EQ(res, expOut);
+
+		res.clear();
+		JsonWriterOrdDictT<JsonWriterKey, JsonWriterObject>::Write(
+			std::back_inserter(res),
+			dict,
+			config, WriterStates()
+		);
+		EXPECT_EQ(res, expOut);
+	}
+
+	config.m_indent = "\t";
+
+	{
+		std::string expOut =
+"{\n\
+	\"0\" : 0,\n\
+	\"1\" : 1,\n\
+	\"2\" : 2,\n\
+	\"a\" : \"a\",\n\
+	\"b\" : \"b\",\n\
+	\"c\" : \"c\"\n\
+}";
+		_Dict dict;
+		dict[_Str("a")] = _Str("a");
+		dict[_Str("b")] = _Str("b");
+		dict[_Str("c")] = _Str("c");
+		dict[_Str("0")] = Internal::Obj::Int64(0);
+		dict[_Str("1")] = Internal::Obj::Int64(1);
+		dict[_Str("2")] = Internal::Obj::Int64(2);
+
+		const Internal::Obj::BaseObj& obj = dict;
+		std::string res = DumpStr(obj, config);
+		EXPECT_EQ(res, expOut);
+
+		res.clear();
+		JsonWriterOrdDictT<JsonWriterKey, JsonWriterObject>::Write(
+			std::back_inserter(res),
+			dict,
+			config, WriterStates()
+		);
+		EXPECT_EQ(res, expOut);
+	}
+}
