@@ -16,6 +16,13 @@ namespace SIMPLEJSON_CUSTOMIZED_NAMESPACE
 {
 
 /**
+ * @brief Placeholder for Auto/Default types
+ *
+ */
+struct AutoPlaceholder {};
+
+
+/**
  * @brief Basic implementation of Parsers
  *
  * @tparam _ContainerType Type of containers which *may* be needed during
